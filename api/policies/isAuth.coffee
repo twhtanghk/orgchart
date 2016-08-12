@@ -4,13 +4,10 @@ Promise = require 'promise'
 
 # check if oauth2 bearer is available
 verifyToken = (token) ->
-	sails.log.debug "start verify!!!!"
 	oauth2 = sails.config.oauth2
-	sails.log.debug "oauth2: #{oauth2}"
 	return new Promise (fulfill, reject) ->
 		sails.services.rest().get token, oauth2.verifyURL			
 			.then (res) -> 
-				sails.log.debug "res.body: #{res.body}"
 				# check required scope authorized or not
 				scope = res.body.scope.split(' ')	
 
@@ -20,7 +17,6 @@ verifyToken = (token) ->
 					
 				# create user
 				# otherwise check if user registered before (defined in model.User or not)
-				sails.log.debug "res.body.user: #{JSON.stringify(res.body.user)}"
 				user = _.pick res.body.user, 'url', 'username', 'email'
 				sails.models.user
 					.findOrCreate user
@@ -29,8 +25,6 @@ verifyToken = (token) ->
 			.catch reject
 			
 passport.use 'bearer', new bearer.Strategy {}, (token, done) ->
-	sails.log.debug "passport use!!!!!!!"
-	sails.log.debug "token: #{token}"
 	fulfill = (user) ->
 		user.token = token
 		done(null, user)

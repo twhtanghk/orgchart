@@ -13,8 +13,6 @@ module.exports = (options = sails.config.http.opts || {}) ->
 		ca:			ca
 	
 	get: (token, url) ->
-		sails.log.debug "rest get token: #{token}"
-		sails.log.debug "rest get url: #{url}"
 		new Promise (fulfill, reject) ->
 			opts =
 				headers:

@@ -10,3 +10,4 @@ module.exports =
 			add:		['isAuth']
 			remove:		['isAuth']			
 			findSuper:	['isAuth', 'user/me']
+			updateSuper:	['isAuth', 'user/me']
