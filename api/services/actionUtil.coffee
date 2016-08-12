@@ -7,6 +7,3 @@ actionUtil.opts ?= (req) ->
 	skip:		actionUtil.parseSkip req
 	sort:		actionUtil.parseSort req
 	populate:	req.param 'populate'
-	pubsub:
-		subscribe:	req._sails.hooks.pubsub and req.isSocket
-		watch:		actionUtil.parseModel(req).autoWatch or req.options.autoWatch

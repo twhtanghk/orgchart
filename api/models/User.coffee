@@ -4,24 +4,30 @@
  # @docs        :: http://sailsjs.org/#!documentation/models
 
 module.exports =
-
-  	tableName:	'users'
-		
-	schema:		true
+	
+	tableName:	'users'
+	
+	schema: true
 	
 	attributes:
+
 		url:
-			type: 		'string'
-			required: 	true
+			type: 'string'
+			required: true
 		username:
-			type: 		'string'
-			required: 	true
+			type: 'string'
+			required: true			
+		
 		email:
-			type:		'string' 
-			required:	true		
+			type: 'string'
+			required: true
+
 		supervisor:
-			model:		'user'
+			model: 'user'
+
 		subordinates:
-			collection:	'user'
-			via:		'supervisor'
+			collection: 'user'
+			via: 'supervisor'
+
+
 			
