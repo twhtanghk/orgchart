@@ -25,9 +25,9 @@ module.exports =
 			port:		27017
 			user:		''
 			password:	''
-			database:	'todosails'	
-	
+			database:	'orgchart'	
+			
 	log:
-		level: 'silly'
+		level: 'info'
 		
 			

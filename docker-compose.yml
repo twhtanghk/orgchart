@@ -1,0 +1,25 @@
+version: '2'
+services:
+  orgchart_mongo:
+    image: mongo
+    container_name: orgchart_mongo
+    hostname: orgchart_mongo
+    ports:
+      - 27017
+    volumes:
+      - /home/myroot/docker.shell/orgchart/data:/data/db
+    command: mongod --directoryperdb   
+    
+    
+  orgchart:
+    depends_on:
+      - orgchart_mongo
+    image: ewnchui/orgchart
+    container_name: orgchart 
+    hostname: orgchart
+    ports:
+      - 1337
+    volumes:
+      - ${COMPOSEROOT}/orgchart/conf/server.coffee:/usr/src/app/config/env/production.coffee
+      - /etc/ssl/certs:/etc/ssl/certs
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
