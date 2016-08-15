@@ -5,6 +5,10 @@ module.exports =
 	
 	port:			1337
 
+	http:
+		opts:
+			agent:	new agent("http://proxy1.scig.gov.hk:8080")				
+	
 	oauth2:
 		verifyURL:			"https://mob.myvnc.com/org/oauth2/verify/"
 		tokenURL:			"https://mob.myvnc.com/org/oauth2/token/"
@@ -21,11 +25,11 @@ module.exports =
 		mongo:
 			adapter:	'sails-mongo'
 			driver:		'mongodb'
-			host:		'localhost'
+			host:		'orgchart_mongo'
 			port:		27017
 			user:		''
 			password:	''
-			database:	'orgchart'	
+			database:	'orgchartDB'	
 			
 	log:
 		level: 'info'
