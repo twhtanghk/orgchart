@@ -29,5 +29,3 @@ module.exports =
 			collection: 'user'
 			via: 'supervisor'
 
-
-			

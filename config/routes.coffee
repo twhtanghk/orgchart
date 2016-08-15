@@ -5,4 +5,7 @@ module.exports =
 			action:			'findSuper'
 		'POST /api/supervisor':
 			controller:		'UserController'
-			action:			'updateSuper'		
+			action:			'updateSuper'
+		'DELETE /api/supervisor':
+			controller:		'UserController'
+			action:			'deleteSuper'					

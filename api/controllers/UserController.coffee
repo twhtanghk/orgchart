@@ -2,6 +2,7 @@
  #
  # @description :: Server-side logic for managing users
  # @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
+Promise = require 'promise'
 actionUtil = require 'sails/lib/hooks/blueprints/actionUtil'
 
 module.exports =
@@ -9,7 +10,7 @@ module.exports =
 		opts = actionUtil.opts req
 		opts.model
 			.findOne()
-			.where opts.where
+			.where {id:opts.where.id}
 			.populateAll()
 			.then (record) ->
 				if record
@@ -20,20 +21,28 @@ module.exports =
 		
 	updateSuper: (req, res) ->
 		opts = actionUtil.opts req
-		opts.model
-			.findOne()
+		queryMe = opts.model.findOne()
 			.where {id:opts.where.id}
-			.then (me) ->
-				opts.model
-					.findOne()
-					.where({username:opts.where.supervisor})
-					.populateAll()
-					.then (superInstance) ->
-						if superInstance
-							superInstance.subordinates.add me
-							superInstance.save()
-							res.ok me
-						else
-							res.notFound() #supervisor not found
-					.catch res.serverError
+			.toPromise()
+		querySuper = opts.model.findOne()
+			.where({username:opts.where.supervisor})
+			.toPromise()
+		
+		new Promise (fulfill, reject) ->
+			Promise.all([queryMe, querySuper])
+				.then (data) ->
+					if data[1]
+						data[1].subordinates.add data[0]
+						data[1].save()
+						res.ok()
+					else
+						res.notFound() #supervisor not found
+				.catch res.serverError
+	
+	deleteSuper: (req, res) ->
+		opts = actionUtil.opts req
+		opts.model
+			.update({id:opts.where.id}, {supervisor:null})
+			.then res.ok()
 			.catch res.serverError
+				
