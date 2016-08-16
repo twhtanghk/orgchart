@@ -25,11 +25,11 @@ module.exports =
 		mongo:
 			adapter:	'sails-mongo'
 			driver:		'mongodb'
-			host:		'orgchart_mongo'
+			host:		'localhost'
 			port:		27017
 			user:		''
 			password:	''
-			database:	'orgchartDB'	
+			database:	'orgchart'	
 			
 	log:
 		level: 'info'

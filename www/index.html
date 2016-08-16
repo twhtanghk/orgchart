@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title>Hotspot</title>
+
+	<!-- ngTagEditor js -->
+	<link href="css/ngTagEditor.css" rel="stylesheet">
+    
+	<link rel="icon" type="image/png" href="img/icon.png" />
+    <link href="lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/ionic.app.css" rel="stylesheet">
+    <link href="css/hotspot.css" rel="stylesheet">
+    
+ 	<link href="lib/ionic/css/ionic.css" rel="stylesheet">
+		<style type="text/css">
+			.scroll {
+				height: 100%;
+			}
+			iframe {
+				width: 100%;
+				height: 100%;	
+			}
+			.item-avatar i:first-child, .item-avatar .item-img {
+			    position: absolute;
+			    top: 15px;
+			    left: 15px;
+			    font-size: 36px;
+			    max-width: 40px;
+			    max-height: 40px;
+			    width: 100%;
+			    border-radius: 4px; 
+			}
+		</style> 
+	</link>  
+    <!-- ionic/angularjs js -->
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+     
+    <script src="lib/angular-filter/dist/angular-filter.min.js"></script>
+        
+	<!-- util.auth -->
+	<script type="text/javascript" src="lib/sails.io.js/dist/sails.io.js"></script>
+	<script type="text/javascript">
+			io.sails.autoConnect = false;
+	</script> 	
+
+	<!-- angularSails -->
+	<script src="lib/angularSails/dist/ngsails.io.js" > </script>     
+    
+    
+    <!-- your app's js -->
+    <script src="js/index.js"></script>
+
+    <!-- ngTagEditor js -->
+    <script type="text/javascript" src="js/ngTagEditor/ngTagEditor.js"></script>   
+
+	<!-- angular google map js -->
+	<script src="lib/angular-google-maps/dist/angular-google-maps.min.js"></script>
+	<script src="lib/angular-simple-logger/dist/angular-simple-logger.min.js"></script>
+
+	
+  </head>
+
+  <body ng-app="starter">
+    <ion-nav-view></ion-nav-view>
+  </body>
+</html>

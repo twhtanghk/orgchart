@@ -12,3 +12,4 @@ module.exports =
 			findSuper:	['isAuth', 'user/me']
 			updateSuper:	['isAuth', 'user/me']
 			deleteSuper:	['isAuth', 'user/me']
+			findMe:		['isAuth', 'user/me']

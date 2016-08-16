@@ -8,4 +8,7 @@ module.exports =
 			action:			'updateSuper'
 		'DELETE /api/supervisor':
 			controller:		'UserController'
-			action:			'deleteSuper'					
+			action:			'deleteSuper'
+		'GET /api/user/me':
+			controller:		'UserController'
+			action:			'findMe'					

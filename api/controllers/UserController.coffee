@@ -45,4 +45,16 @@ module.exports =
 			.update({id:opts.where.id}, {supervisor:null})
 			.then res.ok()
 			.catch res.serverError
+	findMe: (req, res) ->
+		opts = actionUtil.opts req
+		opts.model
+			.findOne()
+			.where {id:opts.where.id}
+			.populateAll()
+			.then (me) ->
+				if me
+					res.ok me
+				else
+					res.notFound()
+			.catch res.serverError		
 				
