@@ -6,6 +6,7 @@ Promise = require 'promise'
 actionUtil = require 'sails/lib/hooks/blueprints/actionUtil'
 
 module.exports =
+	###
 	findSuper: (req, res)->
 		opts = actionUtil.opts req
 		opts.model
@@ -45,6 +46,7 @@ module.exports =
 			.update({id:opts.where.id}, {supervisor:null})
 			.then res.ok()
 			.catch res.serverError
+	###
 	findMe: (req, res) ->
 		opts = actionUtil.opts req
 		opts.model
