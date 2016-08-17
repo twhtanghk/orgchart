@@ -18,6 +18,17 @@ angular.module 'starter', ['ionic', 'starter.controller', 'starter.model', 'Acti
 			abstract: true
 			templateUrl: "templates/menu.html"
 
+		$stateProvider.state 'app.user.update',
+			url: '/update'
+			views:
+				userContent:
+					templateUrl: 'templates/user/update.html'
+					controller: 'UserUpdateCtrl'
+			resolve:
+				resource: 'resource'
+				model: (resource) ->
+					resource.User.me().$fetch()
+
 		$stateProvider.state 'app.orgchart',
 			url: "/orgchart"
 			cache: false
