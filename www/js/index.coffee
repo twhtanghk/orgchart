@@ -4,7 +4,7 @@ window.oalert = window.alert
 window.alert = (err) ->
 	window.oalert err.data.error
 window.Promise = require 'promise'
-window._ = require 'underscore'
+window._ = require 'lodash'
 window.$ = require 'jquery'
 window.$.deparam = require 'jquery-deparam'
 if env.isNative()
@@ -22,8 +22,6 @@ require 'angular-ui-router'
 require 'ionic'
 require 'sails-auth'
 require 'util.auth'
-require 'googlemaps-utils'
-require 'angular-google-maps'
 require './app.coffee'
 require './controller.coffee'
 require './model.coffee'

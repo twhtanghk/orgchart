@@ -1,25 +1,26 @@
 version: '2'
 services:
   orgchart_mongo:
-    image: mongo
-    container_name: orgchart_mongo
     hostname: orgchart_mongo
+    container_name: orgchart_mongo
+    image: mongo
     ports:
       - 27017
     volumes:
-      - /home/myroot/docker.shell/orgchart/data:/data/db
-    command: mongod --directoryperdb   
+      - /home/ewnchui/git/compose/orgchart/data:/data/db 
     
     
   orgchart:
+    hostname: orgchart
+    container_name: orgchart
     depends_on:
       - orgchart_mongo
     image: ewnchui/orgchart
-    container_name: orgchart 
-    hostname: orgchart
     ports:
       - 1337
+    entrypoint: top -b -d 1000  
     volumes:
-      - ${COMPOSEROOT}/orgchart/conf/server.coffee:/usr/src/app/config/env/production.coffee
-      - /etc/ssl/certs:/etc/ssl/certs
-      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - ./entrypoint.sh:/usr/src/app/entrypoint.sh
+      - ./config/docker/development.coffee:/usr/src/app/config/env/development.coffee
+      - /etc/ssl/certs/mobile.ogcio.hksarg.pem:/etc/ssl/certs/mobile.ogcio.hksarg.pem
+      - /usr/local/share/ca-certificates/mobile.ogcio.hksarg.crt:/usr/src/app/ca-certificates/mobile.ogcio.hksarg.crt      

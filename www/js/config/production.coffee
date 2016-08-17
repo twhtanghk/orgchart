@@ -1,5 +1,5 @@
 io.sails.url = 'https://mob.myvnc.com'
-io.sails.path = "/hotspot/socket.io"
+io.sails.path = "/orgchart/socket.io"
 io.sails.useCORSRouteToGetCookie = false
 
 module.exports =
@@ -24,4 +24,4 @@ module.exports =
 			authUrl: "https://mob.myvnc.com/org/oauth2/authorize/"
 			response_type:	"token"
 			scope:			"https://mob.myvnc.com/org/users"
-			client_id:		'hotspotUATAuth'
+			client_id:		'orgchartUAT'

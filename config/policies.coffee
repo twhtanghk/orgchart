@@ -2,7 +2,8 @@ module.exports =
 	policies:
 		UserController:
 			'*':		false
-			find:		['isAuth']
+			find:		true
+			#find:		['isAuth']
 			findOne:	['isAuth']
 			create:		['isAuth']
 			update:		['isAuth']

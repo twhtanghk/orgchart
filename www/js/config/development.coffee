@@ -1,5 +1,5 @@
 io.sails.url = 'https://mob.myvnc.com'
-io.sails.path = "/hotspot/socket.io"
+io.sails.path = "/orgchart/socket.io"
 io.sails.useCORSRouteToGetCookie = false
 
 module.exports =
@@ -13,7 +13,7 @@ module.exports =
 
 	serverUrl: (path = @path) ->
 		"https://mob.myvnc.com/#{@path}"
-	path: 'hotspot'		
+	path: 'orgchart'		
 	server:
 		rest:
 			urlRoot:	'https://mob.myvnc.com/org'

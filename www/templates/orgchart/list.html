@@ -1,0 +1,17 @@
+<ion-view>
+	<ion-nav-buttons class="item-input-inset">
+	    <button class="button button-icon button-clear ion-navicon" menu-toggle="left">
+        </button>
+	    <h1 class='title'>OrgChart</h1>
+	    <button class="button icon-right ion-plus-round" on-tap="create()"></button>
+	</ion-nav-buttons>
+	<ion-content>
+		<ion-list>
+			<ion-item>				
+				<p>item<p>
+			</ion-item>
+		</ion-list>
+		<ion-infinite-scroll ng-if="collection.state.skip < collection.state.count" on-infinite="loadMore()">	
+		</ion-infinite-scroll>	
+	</ion-content>
+</ion-view>
