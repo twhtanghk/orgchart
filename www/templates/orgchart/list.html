@@ -2,16 +2,16 @@
 	<ion-nav-buttons class="item-input-inset">
 	    <button class="button button-icon button-clear ion-navicon" menu-toggle="left">
         </button>
-	    <h1 class='title'>OrgChart</h1>
-	    <button class="button icon-right ion-plus-round" on-tap="create()"></button>
+	    <h1 class='title'>Organization Chart</h1>
 	</ion-nav-buttons>
 	<ion-content>
-		<ion-list>
-			<ion-item>				
-				<p>item<p>
-			</ion-item>
-		</ion-list>
-		<ion-infinite-scroll ng-if="collection.state.skip < collection.state.count" on-infinite="loadMore()">	
-		</ion-infinite-scroll>	
+		<div 
+			data-angular-treeview="true" 
+			data-tree-id="abc" 
+			data-tree-model="treedata" 
+			data-node-id="id" 
+			data-node-label="email" 
+			data-node-children="subordinates">
+		</div>
 	</ion-content>
 </ion-view>

@@ -1,6 +1,6 @@
 env = require './env.coffee'
 
-angular.module 'starter', ['ionic', 'starter.controller', 'starter.model', 'ActiveRecord', 'angular.filter', 'util.auth']
+angular.module 'starter', ['ionic', 'starter.controller', 'starter.model', 'ActiveRecord', 'angular.filter', 'util.auth', 'angularTreeview']
 
 	.run (authService) ->
 		authService.login env.oauth2.opts
@@ -18,16 +18,19 @@ angular.module 'starter', ['ionic', 'starter.controller', 'starter.model', 'Acti
 			abstract: true
 			templateUrl: "templates/menu.html"
 
-		$stateProvider.state 'app.user.update',
+		$stateProvider.state 'app.update',
 			url: '/update'
 			views:
-				userContent:
+				menuContent:
 					templateUrl: 'templates/user/update.html'
 					controller: 'UserUpdateCtrl'
 			resolve:
-				resource: 'resource'
-				model: (resource) ->
-					resource.User.me().$fetch()
+				cliModel: 'model'
+				model: (cliModel) ->
+					cliModel.User.me().$fetch()
+				collection: (cliModel) ->
+					ret = new cliModel.OauthUsers()
+					ret.$fetch({params: {sort: 'name ASC'}})
 
 		$stateProvider.state 'app.orgchart',
 			url: "/orgchart"
@@ -35,6 +38,11 @@ angular.module 'starter', ['ionic', 'starter.controller', 'starter.model', 'Acti
 			views:
 				'menuContent':
 					templateUrl: "templates/orgchart/list.html"
-					controller: 'UserListCtrl'
+					controller: 'OrgChartCtrl'
+			resolve:
+				cliModel: 'model'
+				collection: (cliModel) ->
+					ret = new cliModel.OrgChart()
+					ret.$fetch({params: {sort: 'name ASC'}})
 
 		$urlRouterProvider.otherwise('/orgchart')
