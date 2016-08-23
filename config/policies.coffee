@@ -3,10 +3,5 @@ module.exports =
 		UserController:
 			'*':		false
 			find:		true
-			findOne:	true
-			create:		['isAuth']
-			update:		['isAuth']
-			destroy:	['isAuth']
-			add:		['isAuth']
-			remove:		['isAuth']
-			findMe:		['isAuth', 'user/me']
+			findOne:	['isAuthMe', 'user/me']
+			update:		['isAuth', 'user/addSuper']

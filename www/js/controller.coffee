@@ -6,9 +6,17 @@ MenuCtrl = ($scope) ->
 
 OrgChartCtrl = ($scope, collection, $location, model) ->
 	
+	level0 = _.filter collection.models, (model) ->
+		_.isUndefined model.supervisor
+		
 	_.extend $scope,
 		treedata: collection.models
-
+	
+	###
+	_.extend $scope,
+		treedata: _.filter collection.models, (model) ->
+					_.isUndefined model.supervisor
+	###
 UserUpdateCtrl = ($scope, $state, $location, model, collection) ->
 	
 	collection.page = 1
