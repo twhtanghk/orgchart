@@ -5,8 +5,7 @@
 	    <h1 class='title'>
 	    	<span>{{model.email}}</span>
 	    </h1>
-	    <button class="button button-clear button-positive" on-tap="save()">OK</button>
-	    
+	    <button class="button button-clear button-positive" on-tap="save()">OK</button>	    
 	</ion-nav-buttons>
 	<ion-content>
 		<ion-item>
@@ -16,45 +15,25 @@
 					<input id="selectedSuper" type="search" ng-model="model.supervisor.username" placeholder="Supervisor">
 				</div>
 				<div class="col col-25">
-					<a class="button button-outline" ng-click="show(true)">Update</a>
+					<a class="button button-outline" on-tap="$event.stopPropagation();show();">Update</a>
 				</div>
 			</div>
 		</ion-item>
-		<div id="userList" ng-show="userList===true">
-			<ion-list>
+			<div ng-if="userList">
 				<label class="item item-input">
-				    <i class="icon ion-search placeholder-icon"></i>
-				    <input type="search" placeholder="Search" ng-model="logFilter">
+					<i class="icon ion-search placeholder-icon"></i>
+					<input type="search" placeholder="Search" ng-model="userFilter">
 				</label>
-				<ion-item>				
-					<div class='row fontColor'>
-						<div class='col'>
-							Username
-						</div>
-						<div class='col'>
-							Email
-						</div>
-						<div class='col'>
-							URL
-						</div>
-					</div>
-				</ion-item>
-				<ion-item ng-repeat="model in collection.models" on-tap="read(model);show(false);">					
-					<div class='row'>
-						<div class='col'>
-							{{model.username}}
-						</div>
-						<div class='col'>
-							{{model.email}}
-						</div>
-						<div class='col'>
-							{{model.url}}
-						</div>
-					</div>
-				</ion-item>
-			</ion-list>
-		</div>
-		<ion-infinite-scroll ng-if="collection.page < collection.state.total_page" on-infinite="loadMore()">
-		</ion-infinite-scroll>	
+				<a ng-repeat="model in collection.models | UserFilter: userFilter" class="item item-icon-left" on-tap="$event.stopPropagation();select(model);">
+					<i class="icon ion-person"></i>
+					<h2>
+						<span>{{model.username}}</span>
+					</h2>
+					<p>
+						{{model.email}}
+					</p>
+				</a>
+			</div>
+			<ion-infinite-scroll ng-if="collection.page < collection.state.total_page && userList==true" on-infinite="loadMore()">
 	</ion-content>
 </ion-view>
