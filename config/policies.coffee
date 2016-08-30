@@ -5,3 +5,4 @@ module.exports =
 			find:		true
 			findOne:	['isAuthMe', 'user/me']
 			update:		['isAuth', 'user/addSuper']
+			findOauth2User:		['isAuth']

@@ -21,6 +21,7 @@ module.exports =
 		email:
 			type: 'string'
 			required: true
+			unique: true
 
 		supervisor:
 			model: 'user'

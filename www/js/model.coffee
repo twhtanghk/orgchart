@@ -21,17 +21,19 @@ angular.module 'starter.model', ['PageableAR']
 		
 			$urlRoot: "api/user/"		
 
-		class OauthUser extends pageableAR.Model
+		class Oauth2User extends pageableAR.Model
 			$idAttribute: 'username'		
-			$urlRoot: "#{env.server.rest.urlRoot}/api/users/"
+			$urlRoot: "api/oauth2/user/"
+			#$urlRoot: "#{env.server.rest.urlRoot}/api/users/"
 		
 		
-		class OauthUsers extends pageableAR.PageableCollection
-			model: OauthUser
-			$urlRoot: "#{env.server.rest.urlRoot}/api/users/"	
+		class Oauth2Users extends pageableAR.PageableCollection
+			model: Oauth2User
+			$urlRoot: "api/oauth2/user/"
+			#$urlRoot: "#{env.server.rest.urlRoot}/api/users/"	
 
 
 		User:		User
 		OrgChart:	OrgChart
-		OauthUser:	OauthUser
-		OauthUsers:	OauthUsers
+		Oauth2User:	Oauth2User
+		Oauth2Users:	Oauth2Users

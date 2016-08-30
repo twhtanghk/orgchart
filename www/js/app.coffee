@@ -20,6 +20,7 @@ angular.module 'starter', ['ionic', 'starter.controller', 'starter.model', 'Acti
 
 		$stateProvider.state 'app.update',
 			url: '/update'
+			cache: false
 			views:
 				menuContent:
 					templateUrl: 'templates/user/update.html'
@@ -29,7 +30,7 @@ angular.module 'starter', ['ionic', 'starter.controller', 'starter.model', 'Acti
 				model: (cliModel) ->
 					cliModel.User.me().$fetch()
 				collection: (cliModel) ->
-					ret = new cliModel.OauthUsers()
+					ret = new cliModel.Oauth2Users()
 					ret.$fetch({params: {sort: 'name ASC'}})
 
 		$stateProvider.state 'app.orgchart',
