@@ -5,6 +5,7 @@
 	    <h1 class='title'>Organization Chart</h1>
 	</ion-nav-buttons>
 	<ion-content>
+		<!--<div>{{abc.currentNode}}</div>
 		<div 
 			data-angular-treeview="true" 
 			data-tree-id="abc" 
@@ -12,6 +13,16 @@
 			data-node-id="id" 
 			data-node-label="email" 
 			data-node-children="subordinates">
+		</div>-->
+		<treecontrol class="tree-light"
+		   tree-model="treedata"
+		   options="treeOptions"
+		   on-selection="showSelected(node, $index, $parentNode)"
+		   selected-node="node1">
+		   {{node.email}}
+		</treecontrol>
+		<div class="col col-25">
+			<a class="button button-outline" on-tap="$event.stopPropagation();search();">Search User</a>
 		</div>
 	</ion-content>
 </ion-view>
