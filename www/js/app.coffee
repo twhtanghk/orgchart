@@ -32,35 +32,17 @@ angular.module 'starter', ['ionic', 'starter.controller', 'starter.model', 'Acti
 				collection: (cliModel) ->
 					ret = new cliModel.Oauth2Users()
 					#ret.$fetch({params: {sort: 'name ASC'}})
-
-		$stateProvider.state 'app.searchOrgchart',
-			url: "/orgchart/search"
-			cache: false
-			views:
-				'menuContent':
-					templateUrl: "templates/orgchart/search.html"
-					controller: 'SearchUserCtrl'
-			resolve:
-				cliModel: 'model'
-				collection: (cliModel) ->
-					ret = new cliModel.OrgChart()
-					ret.$fetch({params: {sort: 'name ASC'}})
-				
+			
 		$stateProvider.state 'app.orgchart',
-			url: "/orgchart?id"
+			url: "/orgchart"
 			cache: false
 			views:
 				'menuContent':
 					templateUrl: "templates/orgchart/list.html"
 					controller: 'OrgChartCtrl'
 			resolve:
-				id: ($stateParams) ->
-					$stateParams.id
 				cliModel: 'model'
-				model: (cliModel) ->
-					ret = new cliModel.User()
 				collection: (cliModel) ->
-					ret = new cliModel.OrgChart()
-					ret.$fetch({params: {sort: 'name ASC'}})
+					cliModel.User.noSupervisor()
 
 		$urlRouterProvider.otherwise('/orgchart')

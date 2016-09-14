@@ -6,7 +6,7 @@
 	</ion-nav-buttons>
 	<ion-content>
 		<!--<div>{{abc.currentNode}}</div>
-		<div 
+		<!--<div 
 			data-angular-treeview="true" 
 			data-tree-id="abc" 
 			data-tree-model="treedata" 
@@ -14,15 +14,33 @@
 			data-node-label="email" 
 			data-node-children="subordinates">
 		</div>-->
-		<treecontrol class="tree-light"
-		   tree-model="treedata"
-		   options="treeOptions"
-		   on-selection="showSelected(node, $index, $parentNode)"
-		   selected-node="node1">
-		   {{node.email}}
-		</treecontrol>
-		<div class="col col-25">
-			<a class="button button-outline" on-tap="$event.stopPropagation();search();">Search User</a>
+		<div>
+		  	<label class="item item-input">
+				<i class="icon ion-search placeholder-icon"></i>
+				<input type="search" placeholder="Search" ng-model="userFilter" ng-focus="show();">
+			</label>
 		</div>
+		<div ng-if="userList">
+			<a ng-repeat="model in collection.models | UserFilter: userFilter" class="item item-icon-left" on-tap="$event.stopPropagation();select(model);">
+				<i class="icon ion-person"></i>
+				<h2>
+					<span>{{model.username}}</span>
+				</h2>
+				<p>
+					{{model.email}}
+				</p>
+			</a>
+		</div>
+		<div style="padding-top: 10px;">
+			<treecontrol class="tree-light"
+			   tree-model="collection"
+			   options="{nodeChildren: 'subordinates',dirSelectable: true}"
+			   on-node-toggle="showToggle(node)"
+			   expanded-nodes="expandedNodes"
+			   selected-node="[]">
+			   {{node.username}} ({{node.email}})
+			</treecontrol>
+		</div>
+		
 	</ion-content>
 </ion-view>

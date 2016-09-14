@@ -56,6 +56,7 @@
     "sails": "~0.12",
     "sails-disk": "~0.10.0",
     "sails-hook-mongoat": "^1.0.8",
+    "sails-hook-requestlogger-file": "^2.0.5",
     "sails-mongo": "^0.11.4",
     "shelljs": "^0.5.3",
     "supertest": "^1.1.0",

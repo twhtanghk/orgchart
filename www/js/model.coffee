@@ -9,27 +9,52 @@ angular.module 'starter.model', ['PageableAR']
 		class User extends pageableAR.Model
 			$idAttribute: 'id'
 			
-			$urlRoot: "api/user/"
+			$urlRoot: "api/user"
 			
 			_me = null
 			
 			@me: ->
 				_me ?= new User id: 'me'
+			
+			@root: (user) ->
+				if user.supervisor
+					user.supervisor.$fetch()
+						.then ->
+							User.root(user.supervisor)
+				else
+					Promise.resolve user
+			
+			@noSupervisor: ->
+				User.fetchAll
+					params:
+						supervisor: "null"
+						
+			$parse: (data, opts) ->				
+				if _.isObject(data.supervisor)
+					data.supervisor = new User(data.supervisor)
+				else if _.isString(data.supervisor)
+					data.supervisor = new User(id: data.supervisor)
+
+				data.subordinates = _.map data.subordinates, (subordinate)->
+					new User(subordinate)
+				
+				return data
+	
 		
 		class OrgChart extends pageableAR.PageableCollection
 			model: User
 		
-			$urlRoot: "api/user/"		
+			$urlRoot: "api/user"		
 
 		class Oauth2User extends pageableAR.Model
 			$idAttribute: 'username'		
-			$urlRoot: "api/oauth2/user/"
+			$urlRoot: "api/oauth2/user"
 			#$urlRoot: "#{env.server.rest.urlRoot}/api/users/"
 		
 		
 		class Oauth2Users extends pageableAR.PageableCollection
 			model: Oauth2User
-			$urlRoot: "api/oauth2/user/"
+			$urlRoot: "api/oauth2/user"
 			#$urlRoot: "#{env.server.rest.urlRoot}/api/users/"	
 
 
