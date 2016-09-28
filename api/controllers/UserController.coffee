@@ -17,3 +17,9 @@ module.exports =
 			.then (res2) ->
 				res.ok res2.body
 			.catch res.serverError
+	
+	findPageableUser: (req, res) ->
+		sails.services.crud
+			.find(req)
+			.then res.ok
+			.catch res.serverError		

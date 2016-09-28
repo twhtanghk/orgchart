@@ -1,16 +1,9 @@
+_ = require 'lodash'
 http = require 'needle'
-fs = require 'fs'
-Promise = require 'promise'
+Promise = require 'bluebird'
 util = require 'util'
 
-dir = '/etc/ssl/certs'
-files = fs.readdirSync(dir).filter (file) -> /.*\.pem/i.test(file)
-files = files.map (file) -> "#{dir}/#{file}"
-ca = files.map (file) -> fs.readFileSync file
-
 module.exports = (options = sails.config.http.opts || {}) ->
-	_.defaults options, 
-		ca:			ca
 	
 	get: (token, url) ->
 		new Promise (fulfill, reject) ->
@@ -33,7 +26,7 @@ module.exports = (options = sails.config.http.opts || {}) ->
 				if err
 					return reject err
 				fulfill res
-								
+
 	# get token for Resource Owner Password Credentials Grant
 	# url: 	authorization server url to get token 
 	# client:

@@ -5,23 +5,14 @@
 	    <h1 class='title'>Organization Chart</h1>
 	</ion-nav-buttons>
 	<ion-content>
-		<!--<div>{{abc.currentNode}}</div>
-		<!--<div 
-			data-angular-treeview="true" 
-			data-tree-id="abc" 
-			data-tree-model="treedata" 
-			data-node-id="id" 
-			data-node-label="email" 
-			data-node-children="subordinates">
-		</div>-->
 		<div>
 		  	<label class="item item-input">
 				<i class="icon ion-search placeholder-icon"></i>
 				<input type="search" placeholder="Search" ng-model="userFilter" ng-focus="show();">
 			</label>
 		</div>
-		<div ng-if="userList">
-			<a ng-repeat="model in collection.models | UserFilter: userFilter" class="item item-icon-left" on-tap="$event.stopPropagation();select(model);">
+		<div ng-if="listView">
+			<a ng-repeat="model in userList.models | UserFilter: userFilter" class="item item-icon-left" on-tap="$event.stopPropagation();select(null, model);hide()">
 				<i class="icon ion-person"></i>
 				<h2>
 					<span>{{model.username}}</span>
@@ -31,16 +22,16 @@
 				</p>
 			</a>
 		</div>
-		<div style="padding-top: 10px;">
-			<treecontrol class="tree-light"
-			   tree-model="collection"
-			   options="{nodeChildren: 'subordinates',dirSelectable: true}"
-			   on-node-toggle="showToggle(node)"
-			   expanded-nodes="expandedNodes"
-			   selected-node="[]">
-			   {{node.username}} ({{node.email}})
-			</treecontrol>
+		<div ng-if="listView==false" style="padding-top: 10px;">
+			<div style="padding-top: 10px;">
+				<treecontrol class="tree-light"
+				   tree-model="collection"
+				   expanded-nodes="expandedNodes"
+				   options="{nodeChildren: 'subordinates',dirSelectable: true}"
+				   on-node-toggle="showToggle(node, expanded, $parentNode, $index, $first, $middle, $last, $odd, $even, $path)">
+				   {{node.username}} ({{node.email}})
+				</treecontrol>
+			</div>
 		</div>
-		
 	</ion-content>
 </ion-view>

@@ -26,12 +26,12 @@ angular.module 'starter', ['ionic', 'starter.controller', 'starter.model', 'Acti
 					templateUrl: 'templates/user/update.html'
 					controller: 'UserUpdateCtrl'
 			resolve:
-				cliModel: 'model'
-				model: (cliModel) ->
-					cliModel.User.me().$fetch()
-				collection: (cliModel) ->
-					ret = new cliModel.Oauth2Users()
-					#ret.$fetch({params: {sort: 'name ASC'}})
+				resources: 'resources'
+				me: (resources) ->
+					resources.User.me().$fetch()
+				collection: (resources, me) ->
+					ret = new resources.Oauth2Users()
+					ret.$fetch({params: {sort: 'name ASC'}})
 			
 		$stateProvider.state 'app.orgchart',
 			url: "/orgchart"
@@ -41,8 +41,11 @@ angular.module 'starter', ['ionic', 'starter.controller', 'starter.model', 'Acti
 					templateUrl: "templates/orgchart/list.html"
 					controller: 'OrgChartCtrl'
 			resolve:
-				cliModel: 'model'
-				collection: (cliModel) ->
-					cliModel.User.noSupervisor()
+				resources: 'resources'
+				collection: (resources) ->
+					resources.User.noSupervisor()
+				userList: (resources) ->
+					ret = new resources.Users()
+					ret.$fetch({params: {sort: 'name ASC'}})
 
 		$urlRouterProvider.otherwise('/orgchart')

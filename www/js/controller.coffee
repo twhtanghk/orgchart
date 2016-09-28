@@ -8,16 +8,55 @@ angular
 		$scope.env = env
 		$scope.navigator = navigator
 		
-	.controller 'OrgChartCtrl', ($stateParams, $scope, collection, $location, cliModel) ->
+	.controller 'OrgChartCtrl', ($scope, collection, $location, resources, userList) ->
 		_.extend $scope,
+			expandedNodes: []
+			listView: false
+			userList: userList
 			collection: collection
+			showToggle: (node, expanded, $parentNode) ->
+				if expanded
+					Promise
+						.all _.map node.subordinates, (child) ->
+							if child.subordinates.length == 0
+								subordinate = new resources.User id: child.id
+								subordinate.$fetch()
+							else
+								return child
+						.then (data)->
+							node.subordinates = data
+							$scope.$apply()
+							test = $scope.collection
+							return node.subordinates
+			select: (nodes, user) ->
+				if nodes == null
+					new resources.User.root(user)
+						.then (rootSupervisor) ->
+							match = _.findWhere $scope.collection, {id: rootSupervisor.id}
+							if match
+								i = _.indexOf($scope.collection, match)
+								$scope.expandedNodes.push $scope.collection[i]
+								$scope.showToggle($scope.collection[i], true)
+									.then (data) ->
+										$scope.select(data, user)
+				else
+					_.each nodes, (node) ->
+						if node.id != user.id
+							$scope.expandedNodes.push node
+							$scope.showToggle(node, true)
+								.then (data) ->
+									$scope.select(data, user)
+			hide: ->
+				$scope.listView = false
+			show: ->
+				$scope.listView = true
+		
 			
-	.controller 'UserUpdateCtrl', ($scope, $state, $location, model, collection) ->	
-		collection.$fetch({params: {sort: 'name ASC'}})
+	.controller 'UserUpdateCtrl', ($scope, $state, $location, me, collection) ->	
 		collection.page = 1
 		_.extend $scope,
 			userList: false
-			model: model
+			model: me
 			collection: collection
 			select: (obj) ->
 				$scope.model.supervisor = obj
@@ -40,12 +79,13 @@ angular
 						$scope.$broadcast('scroll.infiniteScrollComplete')
 					.catch alert
 				return @
-
-	.filter 'UserFilter', (user, search) ->
-		r = new RegExp(search, 'i')
-		if search
-			return _.filter user, (item) ->
-				r.test(item?.username) or r.test(item?.email)	
-		else
-			return user
+				
+	.filter 'UserFilter', ->
+		(user, search) ->
+			r = new RegExp(search, 'i')
+			if search
+				return _.filter user, (item) ->
+					r.test(item?.username) or r.test(item?.email)	
+			else
+				return user
 

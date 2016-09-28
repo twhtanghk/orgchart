@@ -59,6 +59,7 @@
     "sails-hook-requestlogger-file": "^2.0.5",
     "sails-mongo": "^0.11.4",
     "shelljs": "^0.5.3",
+    "ssl-root-cas": "^1.2.2",
     "supertest": "^1.1.0",
     "vinyl-source-stream": "^1.1.0",
     "winston": "^2.2.0",

@@ -4,7 +4,7 @@ require 'PageableAR'
 
 angular.module 'starter.model', ['PageableAR']
 	
-	.factory 'model', (pageableAR, $filter, $http) ->
+	.factory 'resources', (pageableAR, $filter, $http) ->
 
 		class User extends pageableAR.Model
 			$idAttribute: 'id'
@@ -41,10 +41,10 @@ angular.module 'starter.model', ['PageableAR']
 				return data
 	
 		
-		class OrgChart extends pageableAR.PageableCollection
+		class Users extends pageableAR.PageableCollection
 			model: User
 		
-			$urlRoot: "api/user"		
+			$urlRoot: "api/pageable/user"		
 
 		class Oauth2User extends pageableAR.Model
 			$idAttribute: 'username'		
@@ -59,6 +59,6 @@ angular.module 'starter.model', ['PageableAR']
 
 
 		User:		User
-		OrgChart:	OrgChart
+		Users:	Users
 		Oauth2User:	Oauth2User
 		Oauth2Users:	Oauth2Users
