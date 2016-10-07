@@ -14,8 +14,9 @@ angular
 			listView: false
 			userList: userList
 			collection: collection
-			showToggle: (node, expanded, $parentNode) ->
+			showToggle: (node, expanded) ->
 				if expanded
+					$scope.expandedNodes.push node
 					Promise
 						.all _.map node.subordinates, (child) ->
 							if child.subordinates.length == 0
@@ -26,8 +27,10 @@ angular
 						.then (data)->
 							node.subordinates = data
 							$scope.$apply()
-							test = $scope.collection
 							return node.subordinates
+				else
+					i = _.indexOf($scope.expandedNodes, node)
+					$scope.expandedNodes.splice i, 1
 			select: (nodes, user) ->
 				if nodes == null
 					new resources.User.root(user)
@@ -40,19 +43,22 @@ angular
 									.then (data) ->
 										$scope.select(data, user)
 				else
-					_.each nodes, (node) ->
+					_.every nodes, (node) ->
 						if node.id != user.id
 							$scope.expandedNodes.push node
 							$scope.showToggle(node, true)
 								.then (data) ->
 									$scope.select(data, user)
+							return true
+						else
+							return false
 			hide: ->
 				$scope.listView = false
 			show: ->
 				$scope.listView = true
 		
 			
-	.controller 'UserUpdateCtrl', ($scope, $state, $location, me, collection) ->	
+	.controller 'UserUpdateCtrl', ($scope, $state, $location, me, collection, resources) ->	
 		collection.page = 1
 		_.extend $scope,
 			userList: false

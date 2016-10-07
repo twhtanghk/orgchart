@@ -7,8 +7,10 @@ services:
     ports:
       - 27017
     volumes:
-      - /home/ewnchui/git/compose/orgchart/data:/data/db 
-    
+      - ${COMPOSEROOT}/orgchart_data:/data/db 
+    command: mongod --directoryperdb
+    env_file:
+      - ../.env
     
   orgchart:
     hostname: orgchart
@@ -17,10 +19,15 @@ services:
       - orgchart_mongo
     image: ewnchui/orgchart
     ports:
-      - 1337
+      - 8020:1337
+      - 8022:8080
     entrypoint: top -b -d 1000  
     volumes:
-      - ./entrypoint.sh:/usr/src/app/entrypoint.sh
-      - ./config/docker/development.coffee:/usr/src/app/config/env/development.coffee
-      - /etc/ssl/certs/mobile.ogcio.hksarg.pem:/etc/ssl/certs/mobile.ogcio.hksarg.pem
-      - /usr/local/share/ca-certificates/mobile.ogcio.hksarg.crt:/usr/src/app/ca-certificates/mobile.ogcio.hksarg.crt      
+      #- ${COMPOSEROOT}/orgchart82/config/env/development.coffee:/usr/src/app/config/env/development.coffee
+      #- ${COMPOSEROOT}/orgchart82/www/js/config/development.coffee:/usr/src/app/www/js/config/development.coffee
+      - /etc/ssl/certs:/etc/ssl/certs
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      #- ${COMPOSEROOT}/orgchart82/entrypoint.sh:/usr/src/app/entrypoint.sh
+      - ${COMPOSEROOT}/orgchart82:/usr/src/app
+    env_file:
+      - ./.env      

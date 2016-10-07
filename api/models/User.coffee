@@ -10,22 +10,18 @@ module.exports =
 	schema: true
 	
 	attributes:
-
 		url:
 			type: 'string'
 			required: true
 		username:
 			type: 'string'
-			required: true			
-		
+			required: true
 		email:
 			type: 'string'
 			required: true
 			unique: true
-
 		supervisor:
 			model: 'user'
-
 		subordinates:
 			collection: 'user'
 			via: 'supervisor'

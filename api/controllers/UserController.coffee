@@ -22,4 +22,19 @@ module.exports =
 		sails.services.crud
 			.find(req)
 			.then res.ok
-			.catch res.serverError		
+			.catch res.serverError
+		
+	update: (req, res) ->
+		Model = actionUtil.parseModel(req)
+		pk = actionUtil.requirePk(req)
+		values = actionUtil.parseValues(req)
+		
+		sails.models.user.findOne()
+			.where({id: values.supervisor.id})
+			.populateAll()
+			.then (user) ->
+				user.subordinates.add pk
+				user.save()
+				res.ok user
+			.catch res.serverError
+	
