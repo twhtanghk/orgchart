@@ -14,6 +14,8 @@ angular
 			listView: false
 			userList: userList
 			collection: collection
+			showInfo: (node) ->				
+				$scope.$emit 'userInfo', node 
 			showToggle: (node, expanded) ->
 				if expanded
 					$scope.expandedNodes.push node
@@ -61,18 +63,8 @@ angular
 	.controller 'UserUpdateCtrl', ($scope, $state, $location, me, collection, resources) ->	
 		collection.page = 1
 		_.extend $scope,
-			userList: false
 			model: me
 			collection: collection
-			select: (obj) ->
-				$scope.model.supervisor = obj
-				$scope.userList = false
-			show: ->
-				$scope.userList = true
-			save: ->
-				user = $scope.model
-				user.$save().then =>
-					$location.url "/user"
 			loadMore: ->
 				if _.isUndefined collection.page
 					collection.page = collection.state.skip/collection.state.limit + 1
@@ -85,6 +77,14 @@ angular
 						$scope.$broadcast('scroll.infiniteScrollComplete')
 					.catch alert
 				return @
+				
+		$scope.$watch 'model.supervisor', (newvalue, oldvalue) ->
+			if newvalue != oldvalue
+				user = $scope.model
+				#user.supervisor = newvalue
+				user.$save().then =>
+					$location.url "/user"
+			
 				
 	.filter 'UserFilter', ->
 		(user, search) ->

@@ -1,0 +1,20 @@
+<ion-modal-view>
+    <ion-header-bar class="bar bar-header bar-stable">
+      <h1 class="title">{{username}}</h1>
+      <button class="button button-clear button-primary" ng-click="modal.hide()">Close</button>
+    </ion-header-bar>
+    <ion-content class="padding" scroll="false">
+    	<div class = "row">
+    		<div class = "col">Username:</div>
+    		<div class = "col col-75">{{username}}</div>
+    	</div>
+    	<div class = "row">
+    		<div class = "col">Email:</div>
+    		<div class = "col col-75">{{email}}</div>
+    	</div>
+    	<div class = "row">
+    		<div class = "col">URL:</div>
+    		<div class = "col col-75">{{url}}</div>
+    	</div>
+    </ion-content>
+</ion-modal-view>

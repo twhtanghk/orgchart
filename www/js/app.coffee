@@ -1,6 +1,6 @@
 env = require './env.coffee'
 
-angular.module 'starter', ['ionic', 'starter.controller', 'starter.model', 'ActiveRecord', 'angular.filter', 'util.auth', 'treeControl']
+angular.module 'starter', ['ionic', 'starter.controller', 'starter.model', 'ActiveRecord', 'angular.filter', 'util.auth', 'treeControl', 'xeditable', 'ui.select']
 
 	.run (authService) ->
 		authService.login env.oauth2.opts
@@ -10,8 +10,19 @@ angular.module 'starter', ['ionic', 'starter.controller', 'starter.model', 'Acti
 			if (window.cordova && window.cordova.plugins.Keyboard)
 				cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true)
 			if (window.StatusBar)
-				StatusBar.styleDefault()
-							
+				StatusBar.styleDefault()					
+	.run ($rootScope, $ionicModal) ->
+		$rootScope.$on 'userInfo', (event, data) ->
+			_.extend $rootScope,
+				username: data.username
+				email: data.email
+				url: data.url
+			$ionicModal.fromTemplateUrl 'templates/orgchart/modal.html', scope: $rootScope
+				.then (modal) ->
+					modal.show()
+					$rootScope.modal = modal			
+	.run (editableOptions) ->
+		editableOptions.theme = 'bs3'
 	.config ($stateProvider, $urlRouterProvider) ->
 		$stateProvider.state 'app',
 			url: ""

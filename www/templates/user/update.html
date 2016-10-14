@@ -5,35 +5,30 @@
 	    <h1 class='title'>
 	    	<span>{{model.email}}</span>
 	    </h1>
-	    <button class="button button-clear button-positive" on-tap="save()">OK</button>	    
 	</ion-nav-buttons>
 	<ion-content>
-		<ion-item>
+		<form data-editable-form name="uiSelectForm">
 			<div class="row">
-				<div style="vertical-align: middle" class="col col-25">Supervisor:</div>
-				<div class="col col-50"><label class="item item-input">
-					<input id="selectedSuper" type="search" ng-model="model.supervisor.username" placeholder="Supervisor">
+				<div style="padding-right: 20px;vertical-align: middle;text-align: right" class="col col-25">Supervisor:</div>
+				<div class="col col-25" editable-ui-select="model.supervisor" data-e-form="uiSelectForm" data-e-name="supervisor" name="supervisor" theme="select2" data-e-ng-model="model.supervisor" data-e-style="min-width:300px;">
+					{{model.supervisor.username}}
+					<editable-ui-select-match placeholder="Supervisor">
+						{{$select.selected.username}}
+					</editable-ui-select-match>
+					<editable-ui-select-choices repeat="item in collection.models | filter: $select.search track by $index">
+						<div style='font-size:large;' ng-bind-html="item.username | highlight: $select.search"></div>
+              			<div style='font-size:small;' ng-bind-html="item.email | highlight: $select.search"></div>
+					</editable-ui-select-choices>
 				</div>
-				<div class="col col-25">
-					<a class="button button-outline" on-tap="$event.stopPropagation();show();">Update</a>
+				<div style="padding-top: 0px" class="col col-50 buttons">
+					<button type="button" class="btn btn-default" ng-click="uiSelectForm.$show()" ng-show="!uiSelectForm.$visible">Edit</button>
+					<!-- buttons to submit / cancel form -->
+					<span ng-show="uiSelectForm.$visible">
+						<button type="submit" class="btn btn-primary" ng-disabled="uiSelectForm.$waiting">Save</button>
+				        <button type="button" class="btn btn-default" ng-disabled="uiSelectForm.$waiting" ng-click="uiSelectForm.$cancel()">Cancel</button>
+					</span>
 				</div>
 			</div>
-		</ion-item>
-			<div ng-if="userList">
-				<label class="item item-input">
-					<i class="icon ion-search placeholder-icon"></i>
-					<input type="search" placeholder="Search" ng-model="userFilter">
-				</label>
-				<a ng-repeat="model in collection.models | UserFilter: userFilter" class="item item-icon-left" on-tap="$event.stopPropagation();select(model);">
-					<i class="icon ion-person"></i>
-					<h2>
-						<span>{{model.username}}</span>
-					</h2>
-					<p>
-						{{model.email}}
-					</p>
-				</a>
-			</div>
-			<ion-infinite-scroll ng-if="collection.page < collection.state.total_page && userList==true" on-infinite="loadMore()">
+		</form>
 	</ion-content>
 </ion-view>
