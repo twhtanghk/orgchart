@@ -15,7 +15,7 @@
 					<editable-ui-select-match placeholder="Supervisor">
 						{{$select.selected.username}}
 					</editable-ui-select-match>
-					<editable-ui-select-choices repeat="item in collection.models | filter: $select.search track by $index">
+					<editable-ui-select-choices when-scrolled="collection.page < collection.state.total_page?loadMore():false" percent="90" repeat="item in collection.models | filter: $select.search track by $index">
 						<div style='font-size:large;' ng-bind-html="item.username | highlight: $select.search"></div>
               			<div style='font-size:small;' ng-bind-html="item.email | highlight: $select.search"></div>
 					</editable-ui-select-choices>

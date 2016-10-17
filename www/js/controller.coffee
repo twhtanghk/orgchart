@@ -74,7 +74,7 @@ angular
 				
 				collection.$fetch({params: {sort: 'name ASC', page: collection.page}})
 					.then ->
-						$scope.$broadcast('scroll.infiniteScrollComplete')
+						$scope.$broadcast('scrollCompleted')
 					.catch alert
 				return @
 				

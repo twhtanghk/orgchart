@@ -1,6 +1,6 @@
 env = require './env.coffee'
 
-angular.module 'starter', ['ionic', 'starter.controller', 'starter.model', 'ActiveRecord', 'angular.filter', 'util.auth', 'treeControl', 'xeditable', 'ui.select']
+angular.module 'starter', ['ionic', 'starter.controller', 'starter.model', 'ActiveRecord', 'angular.filter', 'util.auth', 'treeControl', 'xeditable', 'ui.select', 'angular-scroll-complete']
 
 	.run (authService) ->
 		authService.login env.oauth2.opts
