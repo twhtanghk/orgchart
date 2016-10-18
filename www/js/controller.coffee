@@ -79,12 +79,11 @@ angular
 				return @
 				
 		$scope.$watch 'model.supervisor', (newvalue, oldvalue) ->
-			if newvalue != oldvalue
+			if newvalue != oldvalue && _.isUndefined newvalue.supervisor
 				user = $scope.model
-				#user.supervisor = newvalue
 				user.$save().then =>
 					$location.url "/user"
-			
+	
 				
 	.filter 'UserFilter', ->
 		(user, search) ->
