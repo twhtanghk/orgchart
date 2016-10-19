@@ -27,14 +27,14 @@ module.exports =
 	update: (req, res) ->
 		Model = actionUtil.parseModel(req)
 		pk = actionUtil.requirePk(req)
-		values = actionUtil.parseValues(req)
+		user = actionUtil.parseValues(req)
 		
 		sails.models.user.findOne()
-			.where({id: values.supervisor.id})
+			.where({id: user.supervisor.id})
 			.populateAll()
-			.then (user) ->
-				user.subordinates.add pk
-				user.save()
+			.then (supervisor) ->
+				supervisor.subordinates.add pk
+				supervisor.save()
 				res.ok user
 			.catch res.serverError
 	

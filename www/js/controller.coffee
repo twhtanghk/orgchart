@@ -77,13 +77,10 @@ angular
 						$scope.$broadcast('scrollCompleted')
 					.catch alert
 				return @
-				
-		$scope.$watch 'model.supervisor', (newvalue, oldvalue) ->
-			if newvalue != oldvalue && _.isUndefined newvalue.supervisor
+			save: ->
 				user = $scope.model
 				user.$save().then =>
 					$location.url "/user"
-	
 				
 	.filter 'UserFilter', ->
 		(user, search) ->

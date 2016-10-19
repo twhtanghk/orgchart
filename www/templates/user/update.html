@@ -7,7 +7,7 @@
 	    </h1>
 	</ion-nav-buttons>
 	<ion-content>
-		<form data-editable-form name="uiSelectForm">
+		<form data-editable-form name="uiSelectForm" onaftersave="save()">
 			<div class="row">
 				<div style="padding-right: 20px;vertical-align: middle;text-align: right" class="col col-25">Supervisor:</div>
 				<div class="col col-25" editable-ui-select="model.supervisor" data-e-form="uiSelectForm" data-e-name="supervisor" name="supervisor" theme="select2" data-e-ng-model="model.supervisor" data-e-style="min-width:300px;">

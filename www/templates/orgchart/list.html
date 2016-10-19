@@ -28,7 +28,7 @@
 				<treecontrol class="tree-light"
 				   tree-model="collection"
 				   expanded-nodes="expandedNodes"
-				   options="{nodeChildren: 'subordinates',dirSelectable: true}"
+				   options="{nodeChildren: 'subordinates',dirSelectable: true, injectClasses: {'li': 'tree-li'}}"
 				   on-selection="showInfo(node)"
 				   on-node-toggle="showToggle(node, expanded)">
 				   {{node.username}} ({{node.email}})
