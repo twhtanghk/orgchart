@@ -13,7 +13,7 @@
 			</label>
 		</div>
 		<div ng-if="listView">
-			<a ng-repeat="model in userList.models | UserFilter: userFilter" class="item item-icon-left" on-tap="$event.stopPropagation();select(null, model);hide()">
+			<a ng-repeat="model in userList.models | UserFilter: userFilter" class="item item-icon-left" on-tap="$event.stopPropagation();select(null, model);hide();">
 				<i class="icon ion-person"></i>
 				<h2>
 					<span>{{model.username}}</span>
@@ -28,10 +28,11 @@
 				<treecontrol class="tree-light"
 				   tree-model="collection"
 				   expanded-nodes="expandedNodes"
-				   options="{nodeChildren: 'subordinates',dirSelectable: true, injectClasses: {'li': 'tree-li'}}"
+				   options="{nodeChildren: 'subordinates',dirSelectable: true,allowDeselect: false, injectClasses: {'li': 'tree-li', 'labelSelected': 'tree-labelSelected'}}"
 				   on-selection="showInfo(node)"
+				   selected-node="selected"
 				   on-node-toggle="showToggle(node, expanded)">
-				   {{node.username}} ({{node.email}})
+				    {{node.username}} ({{node.email}})
 				</treecontrol>
 			</div>
 		</div>

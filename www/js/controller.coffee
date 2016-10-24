@@ -14,7 +14,7 @@ angular
 			listView: false
 			userList: userList
 			collection: collection
-			showInfo: (node) ->				
+			showInfo: (node) ->			
 				$scope.$emit 'userInfo', node 
 			showToggle: (node, expanded) ->
 				if expanded
@@ -40,10 +40,14 @@ angular
 							match = _.findWhere $scope.collection, {id: rootSupervisor.id}
 							if match
 								i = _.indexOf($scope.collection, match)
-								$scope.expandedNodes.push $scope.collection[i]
-								$scope.showToggle($scope.collection[i], true)
-									.then (data) ->
-										$scope.select(data, user)
+								if user.id == rootSupervisor.id
+									$scope.selected = $scope.collection[i]
+									$scope.$apply()
+								else
+									$scope.expandedNodes.push $scope.collection[i]
+									$scope.showToggle($scope.collection[i], true)
+										.then (data) ->
+											$scope.select(data, user)
 				else
 					_.every nodes, (node) ->
 						if node.id != user.id
@@ -51,9 +55,9 @@ angular
 							$scope.showToggle(node, true)
 								.then (data) ->
 									$scope.select(data, user)
-							return true
 						else
-							return false
+							$scope.selected = node
+							$scope.$apply()
 			hide: ->
 				$scope.listView = false
 			show: ->
