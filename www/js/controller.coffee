@@ -84,6 +84,7 @@ angular
 			save: ->
 				user = $scope.model
 				user.$save().then =>
+					$scope.$apply()
 					$location.url "/user"
 				
 	.filter 'UserFilter', ->
