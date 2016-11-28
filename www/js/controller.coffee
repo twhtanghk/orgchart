@@ -77,15 +77,22 @@ angular
 				collection.state.skip = 0
 				
 				collection.$fetch({params: {sort: 'name ASC', page: collection.page}})
-					.then ->
+					.then (data) ->
+						resources.User.subord(me, [])
+							.then (result) ->
+								result.push me.email
+								data.models = _.filter data.models, (user) ->
+									_.indexOf(result, user.email) == -1
+								$scope.$apply()						
 						$scope.$broadcast('scrollCompleted')
 					.catch alert
 				return @
+			
 			save: ->
 				user = $scope.model
 				user.$save().then =>
-					$scope.$apply()
-					$location.url "/user"
+					$state.reload();
+					$location.url "/orgchart"
 				
 	.filter 'UserFilter', ->
 		(user, search) ->

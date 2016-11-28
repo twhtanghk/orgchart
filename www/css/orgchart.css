@@ -8,3 +8,12 @@ div.fontColor div{
 .tree-labelSelected{
 	background-color: #fedbca;
 }
+div.nowrap {
+	width: 100%;
+	display: inline-block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	
+}
+

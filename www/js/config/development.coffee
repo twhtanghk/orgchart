@@ -1,4 +1,4 @@
-io.sails.url = 'http://10.30.224.82:8021'
+io.sails.url = 'http://10.30.224.82:8020'
 io.sails.path = "/orgchart/socket.io"
 io.sails.useCORSRouteToGetCookie = false
 
@@ -25,5 +25,3 @@ module.exports =
 			response_type:	"token"
 			scope:			"https://mob.myvnc.com/org/users"
 			client_id:		'orgchart.uat'
-
-									

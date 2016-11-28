@@ -23,6 +23,14 @@ angular.module 'starter.model', ['PageableAR']
 							User.root(user.supervisor)
 				else
 					Promise.resolve user
+			@subord: (user, subordArry)->	
+				Promise.all (_.map user.subordinates, (subordinate) ->
+								subordArry.push subordinate.email
+								subordinate.$fetch()
+									.then ->
+										User.subord(subordinate, subordArry))			
+					.then ->
+						Promise.resolve subordArry
 			
 			@noSupervisor: ->
 				User.fetchAll

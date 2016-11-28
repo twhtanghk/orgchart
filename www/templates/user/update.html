@@ -8,19 +8,21 @@
 	</ion-nav-buttons>
 	<ion-content>
 		<form data-editable-form name="uiSelectForm" onaftersave="save()">
-			<div class="row">
-				<div style="padding-right: 20px;vertical-align: middle;text-align: right" class="col col-25">Supervisor:</div>
-				<div class="col col-25" editable-ui-select="model.supervisor" data-e-form="uiSelectForm" data-e-name="supervisor" name="supervisor" theme="select2" data-e-ng-model="model.supervisor" data-e-style="min-width:300px;">
+			<div style="padding-top: 20px;" class="row">
+				<div style="padding-left:10px; padding-right: 10px;vertical-align: middle;text-align: right" class="col col-33">Supervisor:</div>
+				<div class="col col-67" editable-ui-select="model.supervisor" data-e-form="uiSelectForm" data-e-name="supervisor" name="supervisor" theme="select2" data-e-ng-model="model.supervisor" data-e-style="min-width:220px;">
 					{{model.supervisor.username}}
 					<editable-ui-select-match placeholder="Supervisor">
 						{{$select.selected.username}}
 					</editable-ui-select-match>
 					<editable-ui-select-choices when-scrolled="collection.page < collection.state.total_page?loadMore():false" percent="90" repeat="item in collection.models | filter: $select.search track by $index">
 						<div style='font-size:large;' ng-bind-html="item.username | highlight: $select.search"></div>
-              			<div style='font-size:small;' ng-bind-html="item.email | highlight: $select.search"></div>
+              			<div style='font-size:small;' class="nowrap" ng-bind-html="item.email | highlight: $select.search"></div>
 					</editable-ui-select-choices>
 				</div>
-				<div style="padding-top: 0px" class="col col-50 buttons">
+			</div>
+			<div style="padding-top: 20px;" class="row">
+				<div style="padding-top: 0px;" class="col col-67 col-offset-33 buttons">
 					<button type="button" class="btn btn-default" ng-click="uiSelectForm.$show()" ng-show="!uiSelectForm.$visible">Edit</button>
 					<!-- buttons to submit / cancel form -->
 					<span ng-show="uiSelectForm.$visible">

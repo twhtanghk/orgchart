@@ -41,9 +41,16 @@ angular.module 'starter', ['ionic', 'starter.controller', 'starter.model', 'Acti
 				me: (resources) ->
 					resources.User.me().$fetch()
 				collection: (resources, me) ->
-					ret = new resources.Oauth2Users()
-					ret.$fetch({params: {sort: 'name ASC'}})
-			
+					resources.User.subord(me, [])
+						.then (result) ->
+							result.push me.email
+							ret = new resources.Oauth2Users()
+							ret.$fetch({params: {sort: 'name ASC'}})
+								.then (data) ->
+									ret.models = _.filter data.models, (user) ->
+										_.indexOf(result, user.email) == -1
+									return ret
+
 		$stateProvider.state 'app.orgchart',
 			url: "/orgchart"
 			cache: false
