@@ -61,8 +61,7 @@ angular
 			hide: ->
 				$scope.listView = false
 			show: ->
-				$scope.listView = true
-		
+				$scope.listView = true			
 			
 	.controller 'UserUpdateCtrl', ($scope, $state, $location, me, collection, resources) ->	
 		collection.page = 1
@@ -91,8 +90,11 @@ angular
 			save: ->
 				user = $scope.model
 				user.$save().then =>
-					$state.reload();
 					$location.url "/orgchart"
+					$state.reload()
+			reset: ->
+				$scope.model.supervisor = null
+				$scope.save()
 				
 	.filter 'UserFilter', ->
 		(user, search) ->

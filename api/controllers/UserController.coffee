@@ -28,13 +28,20 @@ module.exports =
 		Model = actionUtil.parseModel(req)
 		pk = actionUtil.requirePk(req)
 		user = actionUtil.parseValues(req)
-		
-		sails.models.user.findOne()
-			.where({id: user.supervisor.id})
-			.populateAll()
-			.then (supervisor) ->
-				supervisor.subordinates.add pk
-				supervisor.save()
-				res.ok user
-			.catch res.serverError
+
+		if (user.supervisor == null || _.isUndefined user.supervisor)
+			sails.models.user.update(pk, user)
+				.then (updatedRecord) ->
+					res.ok updatedRecord
+				.catch res.serverError
+		else
+			sails.models.user.findOne()
+				.where({id: user.supervisor.id})
+				.populateAll()
+				.then (supervisor) ->
+					supervisor.subordinates.add pk
+					supervisor.save()
+					res.ok user
+				.catch res.serverError
+			
 	
