@@ -23,18 +23,23 @@ module.exports =
 			.find(req)
 			.then res.ok
 			.catch res.serverError
-		
 	update: (req, res) ->
 		Model = actionUtil.parseModel(req)
 		pk = actionUtil.requirePk(req)
 		user = actionUtil.parseValues(req)
+
+		#check whether user is admin
+		sails.models.user.admin()
+			.then (admin) ->
+				if pk == admin.id
+					pk = user.selUser.id
 
 		if (user.supervisor == null || _.isUndefined user.supervisor)
 			sails.models.user.update(pk, user)
 				.then (updatedRecord) ->
 					res.ok updatedRecord
 				.catch res.serverError
-		else
+		else		
 			sails.models.user.findOne()
 				.where({id: user.supervisor.id})
 				.populateAll()
@@ -43,5 +48,8 @@ module.exports =
 					supervisor.save()
 					res.ok user
 				.catch res.serverError
+	findForSelect: (req, res) ->
+		@findPageableUser(req, res)
+	
 			
 	

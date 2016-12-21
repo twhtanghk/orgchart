@@ -7,3 +7,4 @@ module.exports =
 			update:		['isAuth', 'user/addSuper']
 			findOauth2User:		['isAuth']
 			findPageableUser:	true
+			findForSelect: ['isAuth', 'user/isAdmin']

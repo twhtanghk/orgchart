@@ -1,7 +1,6 @@
 env = require './env.coffee'
 require 'PageableAR'
 
-
 angular.module 'starter.model', ['PageableAR']
 	
 	.factory 'resources', (pageableAR, $filter, $http) ->
@@ -47,11 +46,9 @@ angular.module 'starter.model', ['PageableAR']
 					new User(subordinate)
 				
 				return data
-	
 		
 		class Users extends pageableAR.PageableCollection
 			model: User
-		
 			$urlRoot: "api/pageable/user"		
 
 		class Oauth2User extends pageableAR.Model
@@ -63,10 +60,14 @@ angular.module 'starter.model', ['PageableAR']
 		class Oauth2Users extends pageableAR.PageableCollection
 			model: Oauth2User
 			$urlRoot: "api/oauth2/user"
-			#$urlRoot: "#{env.server.rest.urlRoot}/api/users/"	
+		
+		class AdminSelectUsers extends pageableAR.PageableCollection
+			model: User
+			$urlRoot: "/api/admForSelect/user"		
 
 
 		User:		User
 		Users:	Users
 		Oauth2User:	Oauth2User
 		Oauth2Users:	Oauth2Users
+		AdminSelectUsers:	AdminSelectUsers

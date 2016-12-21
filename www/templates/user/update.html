@@ -7,7 +7,21 @@
 	    </h1>
 	</ion-nav-buttons>
 	<ion-content scroll="false">
-		<form data-editable-form name="uiSelectForm" onaftersave="save()">
+		<form data-editable-form name="uiSelectForm" onaftersave="save()">			
+			<div ng-if="userList.length!=0" style="padding-top: 20px;" class="row">
+				<div style="padding-left:10px; padding-right: 10px;vertical-align: middle;text-align: right" class="col col-33">User:</div>
+				<div class="col col-67" editable-ui-select="model.selUser" data-e-form="model" data-e-name="model" name="model" theme="select2" data-e-ng-model="model" data-e-style="min-width:220px;">
+					<div class="editable">{{model.username}}</div>
+					<editable-ui-select-match placeholder="User">
+						{{$select.selected.username}}
+					</editable-ui-select-match>
+					<editable-ui-select-choices when-scrolled="userList.page < userList.state.total_page?loadMore():false" percent="90" repeat="item in userList.models | filter: $select.search track by $index">
+						<div style='font-size:large;' ng-bind-html="item.username | highlight: $select.search"></div>
+              			<div style='font-size:small;' class="nowrap" ng-bind-html="item.email | highlight: $select.search"></div>
+					</editable-ui-select-choices>
+				</div>
+			</div>
+			
 			<div style="padding-top: 20px;" class="row">
 				<div style="padding-left:10px; padding-right: 10px;vertical-align: middle;text-align: right" class="col col-33">Supervisor:</div>
 				<div class="col col-67" editable-ui-select="model.supervisor" data-e-form="uiSelectForm" data-e-name="supervisor" name="supervisor" theme="select2" data-e-ng-model="model.supervisor" data-e-style="min-width:220px;">
@@ -28,7 +42,7 @@
 					<span ng-show="uiSelectForm.$visible">
 						<button type="submit" class="btn btn-primary" ng-disabled="uiSelectForm.$waiting">Save</button>
 				        <button type="button" class="btn btn-default" ng-disabled="uiSelectForm.$waiting" ng-click="uiSelectForm.$cancel()">Cancel</button>
-				        <button type="button" class="btn btn-secondary" ng-disabled="uiSelectForm.$waiting" ng-click="reset()">Reset</button>
+				        <button type="button" class="btn btn-secondary" ng-disabled="uiSelectForm.$waiting" ng-if="model.supervisor.username!=undefined" ng-click="reset()">Reset</button>
 					</span>
 				</div>
 			</div>

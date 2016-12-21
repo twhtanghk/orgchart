@@ -63,11 +63,12 @@ angular
 			show: ->
 				$scope.listView = true			
 			
-	.controller 'UserUpdateCtrl', ($scope, $state, $location, me, collection, resources) ->	
+	.controller 'UserUpdateCtrl', ($scope, $state, $location, me, collection, resources, adminSelectUsers) ->	
 		collection.page = 1
 		_.extend $scope,
 			model: me
 			collection: collection
+			userList: adminSelectUsers
 			loadMore: ->
 				if _.isUndefined collection.page
 					collection.page = collection.state.skip/collection.state.limit + 1

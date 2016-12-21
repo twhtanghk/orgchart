@@ -6,4 +6,9 @@ module.exports =
 			
 		'GET /api/pageable/user':
 			controller:		'UserController'
-			action:			'findPageableUser'				
+			action:			'findPageableUser'
+			
+		'GET /api/admForSelect/user':
+			controller:		'UserController'
+			action:			'findForSelect'	
+			

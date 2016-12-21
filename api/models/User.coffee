@@ -26,3 +26,12 @@ module.exports =
 			collection: 'user'
 			via: 'supervisor'
 
+	admin: (cb) ->
+		ret = sails.models.user
+			.findOne username: sails.config.adminUser.username
+				
+		if cb
+			ret.nodeify cb
+			return @
+		return ret 
+
