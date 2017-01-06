@@ -61,41 +61,43 @@ angular
 			hide: ->
 				$scope.listView = false
 			show: ->
-				$scope.listView = true			
+				$scope.listView = true				
 			
-	.controller 'UserUpdateCtrl', ($scope, $state, $location, me, collection, resources, adminSelectUsers) ->	
-		collection.page = 1
+	.controller 'UserUpdateCtrl', ($scope, $state, $location, me, collection, resources, adminSelectUsers) ->		
+	
+		if _.isUndefined me.supervisor
+			me.supervisor = ''
+		else
+			_.map collection.models, (user) ->
+				if user.email == me.supervisor.email
+					user.id = me.supervisor.id
+		
 		_.extend $scope,
 			model: me
 			collection: collection
 			userList: adminSelectUsers
-			loadMore: ->
-				if _.isUndefined collection.page
-					collection.page = collection.state.skip/collection.state.limit + 1
-				else
-					collection.page = collection.page + 1
-				collection.state.skip = 0
-				
-				collection.$fetch({params: {sort: 'name ASC', page: collection.page}})
-					.then (data) ->
-						resources.User.subord(me, [])
-							.then (result) ->
-								result.push me.email
-								data.models = _.filter data.models, (user) ->
-									_.indexOf(result, user.email) == -1
-								$scope.$apply()						
-						$scope.$broadcast('scrollCompleted')
-					.catch alert
-				return @
-			
+			selected: ''
 			save: ->
-				user = $scope.model
+				if $scope.model.seluser
+					user = $scope.model.seluser
+					user.supervisor = $scope.model.supervisor
+				else
+					user = $scope.model
 				user.$save().then =>
 					$location.url "/orgchart"
 					$state.reload()
 			reset: ->
 				$scope.model.supervisor = null
 				$scope.save()
+			
+		$scope.$on 'selectuser', (event, item) ->
+			if $scope.userList.length==0
+				$scope.model.supervisor = item
+			else
+				if _.isUndefined item.id
+					$scope.model.supervisor = item
+				else
+					$scope.model.seluser = item
 				
 	.filter 'UserFilter', ->
 		(user, search) ->

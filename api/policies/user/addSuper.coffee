@@ -2,7 +2,6 @@ actionUtil = require 'sails/lib/hooks/blueprints/actionUtil'
 
 module.exports = (req, res, next) ->
 	
-	req.options.id = req.user.id
 	values = actionUtil.parseValues(req)
 	if values.supervisor
 		user = _.pick values.supervisor, 'url', 'username', 'email'

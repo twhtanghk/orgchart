@@ -8,12 +8,16 @@ querystring = require 'querystring'
 
 module.exports =		
 	findOauth2User: (req, res) ->
-		Model = actionUtil.parseModel req
 		cond = actionUtil.parseCriteria req
 		url = sails.config.oauth2.userURL
+		values = actionUtil.parseValues(req)
 		
+		strCond = querystring.stringify(cond)
 		
-		sails.services.rest().get req.user.token, "#{url}?#{querystring.stringify(cond)}"
+		if values.skip != null & parseInt(values.skip) > 0 && strCond.length==0
+			strCond = "page=#{(parseInt(values.skip) + 10)/10}"
+	
+		sails.services.rest().get req.user.token, "#{url}?#{strCond}"
 			.then (res2) ->
 				res.ok res2.body
 			.catch res.serverError
@@ -24,7 +28,6 @@ module.exports =
 			.then res.ok
 			.catch res.serverError
 	update: (req, res) ->
-		Model = actionUtil.parseModel(req)
 		pk = actionUtil.requirePk(req)
 		user = actionUtil.parseValues(req)
 
