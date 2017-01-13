@@ -63,7 +63,7 @@ angular.module 'starter.model', ['PageableAR']
 		
 		class AdminSelectUsers extends pageableAR.PageableCollection
 			model: User
-			$urlRoot: "/api/admForSelect/user"		
+			$urlRoot: "api/admForSelect/user"		
 
 
 		User:		User
