@@ -1,6 +1,5 @@
 env = require './env.coffee'
 Promise = require 'promise'
-	
 
 angular
 	.module 'starter.controller', ['ionic', 'ngCordova', 'http-auth-interceptor', 'starter.model', 'platform']		
@@ -65,12 +64,21 @@ angular
 			
 	.controller 'UserUpdateCtrl', ($scope, $state, $location, me, collection, resources, adminSelectUsers) ->		
 	
-		if _.isUndefined me.supervisor
+		updateSup = (item) ->
+			if _.isUndefined item.email
+				$scope.model.supervisor = null
+				$scope.selected = ''
+			else
+				$scope.model.supervisor = item
+		
+		if _.isUndefined(me.supervisor) or _.isNull(me.supervisor)
 			me.supervisor = ''
 		else
 			_.map collection.models, (user) ->
 				if user.email == me.supervisor.email
 					user.id = me.supervisor.id
+		
+		collection.models.unshift(new resources.User {username: 'No Supervisor', selected: false})
 		
 		_.extend $scope,
 			model: me
@@ -85,17 +93,17 @@ angular
 					user = $scope.model
 				user.$save().then =>
 					$location.url "/orgchart"
-					$state.reload()
-			reset: ->
-				$scope.model.supervisor = null
-				$scope.save()
-			
+					$state.reload()		
+		$scope.$on 'resetuser', (event) ->
+			$scope.model.supervisor = null
+			$scope.selected = ''
+		
 		$scope.$on 'selectuser', (event, item) ->
 			if $scope.userList.length==0
-				$scope.model.supervisor = item
+				updateSup(item)
 			else
 				if _.isUndefined item.id
-					$scope.model.supervisor = item
+					updateSup(item)
 				else
 					$scope.model.seluser = item
 				

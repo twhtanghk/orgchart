@@ -5,36 +5,34 @@
 	    <h1 class='title'>
 	    	<span>{{model.email}}</span>
 	    </h1>
-	    <button ng-if="(model.supervisor.username).length>0"class="button button-clear button-positive" ng-click="save()">Save</button>
+	    <button class="button button-clear button-positive" ng-click="save()">Save</button>
 	</ion-nav-buttons>
 	<ion-content>
-		<div ng-if="userList.length!=0" class="row" ng-init="userSel=model">
-			<div class="col col-33 cellStyle">
-				<span class="spanSelect">User: </span>
+		<ion-list>
+			<div ng-if="userList.length!=0">
+				<ion-item class="item-divider whiteBG">User: </ion-item>
+				<ion-item class="itemPadding">
+					<div ng-init="userSel=model">
+						<fancy-select-model template-url="templates/user/select.html" 
+							ng-selected="userSel" 
+							ng-model="userList" 
+							label="username" 
+							title="Select users">
+						</fancy-select-model>
+					</div>
+				</ion-item>
 			</div>
-			<div class="col">
-				<fancy-select-model template-url="templates/user/select.html" 
-					ng-selected="userSel" 
-					ng-model="userList" 
-					label="username" 
-					title="Select users">
-				</fancy-select-model>
-			</div>
-		</div>
-		<div class="row" ng-init="selected=model.supervisor">
-			<div class="col col-33 cellStyle">
-				<span class="spanSelect">Supervisor: </span>
-			</div>
-			<div class="col">
-				<fancy-select-model template-url="templates/user/select.html" 
-					ng-selected="selected" 
-					ng-model="collection" 
-					label="username" 
-					title="Select users">
-				</fancy-select-model>
-			</div>
-		</div>
-		
-		
+			<ion-item class="item-divider whiteBG">Supervisor: </ion-item>
+			<ion-item class="itemPadding">
+				<div ng-init="selected=model.supervisor">
+					<fancy-select-model template-url="templates/user/select.html" 
+						ng-selected="selected" 
+						ng-model="collection" 
+						label="username" 
+						title="Select users">
+					</fancy-select-model>
+				</div>
+			</ion-item>
+		</ion-list>
 	</ion-content>
 </ion-view>
