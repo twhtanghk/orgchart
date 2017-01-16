@@ -78,6 +78,7 @@ angular
 				if user.email == me.supervisor.email
 					user.id = me.supervisor.id
 		
+		me.origSuper = me.supervisor
 		collection.models.unshift(new resources.User {username: 'No Supervisor', selected: false})
 		
 		_.extend $scope,
@@ -87,16 +88,17 @@ angular
 			selected: ''
 			save: ->
 				if $scope.model.seluser
-					user = $scope.model.seluser
+					user = $scope.model.seluser					
 					user.supervisor = $scope.model.supervisor
 				else
 					user = $scope.model
 				user.$save().then =>
+					if me.email != user.email
+						$scope.model.supervisor = $scope.model.origSuper
+						$scope.model.origSuper = null
+					$scope.model.seluser = null	
 					$location.url "/orgchart"
 					$state.reload()		
-		$scope.$on 'resetuser', (event) ->
-			$scope.model.supervisor = null
-			$scope.selected = ''
 		
 		$scope.$on 'selectuser', (event, item) ->
 			if $scope.userList.length==0
