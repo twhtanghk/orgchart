@@ -10,10 +10,10 @@ module.exports =
 	#		agent:	new agent("http://proxy1.scig.gov.hk:8080")				
 	
 	oauth2:
-		verifyURL:			"https://mob.myvnc.com/org/oauth2/verify/"
-		tokenURL:			"https://mob.myvnc.com/org/oauth2/token/"
-		scope:				["https://mob.myvnc.com/org/users"]
-		userURL:			"https://mob.myvnc.com/org/api/users/"
+		verifyURL:			"https://abc.com/org/oauth2/verify/"
+		tokenURL:			"https://abc.com/org/oauth2/token/"
+		scope:				["https://abc.com/org/users"]
+		userURL:			"https://abc.com/org/api/users/"
 
 	promise:
 		timeout:	10000 # ms
