@@ -60,7 +60,8 @@
     "sails-mongo": "^0.11.4",
     "shelljs": "^0.5.3",
     "ssl-root-cas": "^1.2.2",
-    "supertest": "^1.1.0",
+    "supertest": "^3.0.0",
+    "supertest-as-promised": "^4.0.2",
     "vinyl-source-stream": "^1.1.0",
     "winston": "^2.2.0",
     "yargs": "^3.30.0"
