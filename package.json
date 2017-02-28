@@ -68,7 +68,7 @@
   "scripts": {
     "debug": "node debug app.js",
     "start": "node app.js",
-    "test": "mocha test/bootstrap.test.coffee test/unit/**/*.test.coffee"
+    "test": "mocha test/bootstrap.test.coffee test/unit/**/*.coffee"
   },
   "main": "app.js",
   "repository": {
