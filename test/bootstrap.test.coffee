@@ -10,8 +10,7 @@ before (done) ->
   Sails.lift config, (err, sails) ->
     if err
       return done err
-
     done err, sails
 		
 after (done) ->
-  Sails.lower done
+  Sails.lower done	
