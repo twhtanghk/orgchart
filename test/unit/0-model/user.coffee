@@ -4,13 +4,13 @@ describe 'model', ->
   it 'create user', ->
     sails.models.user
       .create
-        username: 'jokyip', url: 'jokyip@ogcio.gov.hk', email: 'jokyip@ogcio.gov.hk'
+        username: 'user1', url: 'user1@ogcio.gov.hk', email: 'user1@ogcio.gov.hk'
       .then (user) ->
         createdBy = user
 
   it 'update supervisor', ->
     sails.models.user
-      .update {username: createdBy.username}, {supervisor: {username: 'ewnchui', url: 'ewnchui@ogcio.gov.hk', email: 'ewnchui@ogcio.gov.hk'}}
+      .update {username: createdBy.username}, {supervisor: {username: 'user2', url: 'user2@ogcio.gov.hk', email: 'user2@ogcio.gov.hk'}}
       .then (user) ->
          createdBy = user
          return
