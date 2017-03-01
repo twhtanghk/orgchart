@@ -1,4 +1,4 @@
-env = require ('../../env.coffee')
+env = require '../../env.coffee'
 
 describe 'model', ->
   createdBy = null
