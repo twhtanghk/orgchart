@@ -5,22 +5,18 @@ module.exports =
 	client: 
 		id:		process.env.CLIENT_ID
 		secret: process.env.CLIENT_SECRET
-	users: [
-		{ username: 'user1', url: 'user1@abc.com', email: 'user1@abc.com' }
-		{ username: 'user2', url: 'user2@abc.com', email: 'user2@abc.com' }
-	]
+	client: 
+		id:		process.env.USER_ID
+		secret: process.env.USER_SECRET
 	getTokens: ->
 		new Promise (fulfill, reject) ->
 			url = process.env.TOKENURL
 			scope = process.env.OAUTH2_SCOPE?.split(' ') || [ 'User', 'Mobile' ]
 			Promise
-				.all [
-					sails.services.rest().token url, module.exports.client, module.exports.users[0], scope
-					sails.services.rest().token url, module.exports.client, module.exports.users[1], scope
-				] 
-				.then (res) ->
-					fulfill _.map res, (response) ->
-						response.body.access_token
+				.resolve sails.services.rest().token url, module.exports.client, module.exports.user, scope
+				.then (res) ->					
+						sails.log res.body
+						res.body.access_token
 				.catch reject
 	getUsers: ->
 		sails.models.user
