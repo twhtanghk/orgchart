@@ -14,9 +14,8 @@ module.exports =
 			scope = process.env.OAUTH2_SCOPE?.split(' ') || [ 'User', 'Mobile' ]
 			Promise
 				.resolve sails.services.rest().token url, module.exports.client, module.exports.user, scope
-				.then (res) ->					
-						sails.log res.body
-						res.body.access_token
+				.then (res) ->
+						fulfill res.body.access_token
 				.catch reject
 	getUsers: ->
 		sails.models.user
