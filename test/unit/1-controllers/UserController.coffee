@@ -19,14 +19,13 @@ describe 'UserController', ->
         env.getUsers()
       .then (res) ->
         users = res
-            
-  describe 'update supervisor', ->
-    it 'update supervisor', ->
-      req sails.hooks.http.app
-        .put '/update'
-        .set 'Authorization', "Bearer #{tokens[0]}"
-        .send
-          supervisor: users[1]
-        .expect 200
-        .then (res) ->
-          Promise.resolve
+
+  it 'update supervisor', ->
+    req sails.hooks.http.app
+      .put '/api/user'
+      .set 'Authorization', "Bearer #{tokens[0]}"
+      .send
+        email: users[1]
+      .expect 200
+      .then (res) ->
+        Promise.resolve
