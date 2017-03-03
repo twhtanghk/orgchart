@@ -8,7 +8,7 @@ module.exports =
 	user: 
 		id:		process.env.USER_ID
 		secret: process.env.USER_SECRET
-	getTokens: ->
+	getToken: ->
 		new Promise (fulfill, reject) ->
 			url = process.env.TOKENURL
 			scope = process.env.OAUTH2_SCOPE?.split(' ') || [ 'User', 'Mobile' ]
@@ -17,7 +17,7 @@ module.exports =
 				.then (res) ->
 						fulfill res.body.access_token
 				.catch reject
-	getUsers: ->
+	getUser: ->
 		sails.models.user
-			.find username: _.map module.exports.users, (user) ->
-				user.id
+			.find username: module.exports.user.id, (user) ->
+				user

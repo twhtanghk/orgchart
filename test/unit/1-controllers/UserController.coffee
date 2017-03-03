@@ -9,21 +9,23 @@ Promise = require 'bluebird'
 describe 'UserController', ->
   @timeout env.timeout
   
-  tokens = null
-  users = null
+  token = null
+  user = null
   
   before ->
-    env.getTokens()
+    env.getToken()
       .then (res) ->
-        tokens = res
+        token = res
+        env.getUser()
+      .then (res) ->
+        user = res
 
   it 'update supervisor', (done) ->
     req sails.hooks.http.app
-      .put '/api/user/me'
-      .set 'Authorization', "Bearer #{tokens}"
+      .put "/api/user/#{user.id}"
+      .set 'Authorization', "Bearer #{token}"
       .send
         supervisor: {username: 'user3', url: 'user3@abc.com', email: 'user3@abc.com'} 
       .expect 200
       .then (res) ->
-         sails.log res.body
          setTimeout (-> done()), 1000
