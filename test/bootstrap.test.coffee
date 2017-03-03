@@ -13,4 +13,4 @@ before (done) ->
     done err, sails
 		
 after (done) ->
-  Sails.lower done	
+  sails.lower done	

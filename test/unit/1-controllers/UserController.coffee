@@ -16,16 +16,14 @@ describe 'UserController', ->
     env.getTokens()
       .then (res) ->
         tokens = res
-        env.getUsers()
-      .then (res) ->
-        users = res
 
-  it 'update supervisor', ->
+  it 'update supervisor', (done) ->
     req sails.hooks.http.app
-      .put '/api/user'
-      .set 'Authorization', "Bearer #{tokens[0]}"
+      .put '/api/user/me'
+      .set 'Authorization', "Bearer #{tokens}"
       .send
-        email: users[1]
+        supervisor: {username: 'user3', url: 'user3@abc.com', email: 'user3@abc.com'} 
       .expect 200
       .then (res) ->
-        Promise.resolve
+         sails.log res.body
+         setTimeout (-> done()), 1000
