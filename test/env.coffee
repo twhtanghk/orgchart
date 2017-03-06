@@ -17,7 +17,3 @@ module.exports =
 				.then (res) ->
 						fulfill res.body.access_token
 				.catch reject
-	getUser: ->
-		sails.models.user
-			.find username: module.exports.user.id, (user) ->
-				user

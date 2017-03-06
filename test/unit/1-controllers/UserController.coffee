@@ -10,22 +10,19 @@ describe 'UserController', ->
   @timeout env.timeout
   
   token = null
-  user = null
   
   before ->
     env.getToken()
       .then (res) ->
         token = res
-        env.getUser()
-      .then (res) ->
-        user = res
 
   it 'update supervisor', (done) ->
     req sails.hooks.http.app
-      .put "/api/user/#{user.id}"
+      .put "/api/user/#{env.user.id}"
       .set 'Authorization', "Bearer #{token}"
-      .send
-        supervisor: {username: 'user3', url: 'user3@abc.com', email: 'user3@abc.com'} 
-      .expect 200
+      .send 
+         supervisor: {email: 'user4@abc.com', username: 'user4', url: 'user4@abc.com'}
+      .toPromise()
+      .delay(100)
       .then (res) ->
-         setTimeout (-> done()), 1000
+         done()
