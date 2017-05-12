@@ -1,4 +1,5 @@
 module.exports = 
+  hookTimeout: 50000
   http:
     middleware:
       order: [

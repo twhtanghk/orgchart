@@ -3,5 +3,5 @@ module.exports =
     UserController:
       '*': false
       find: true
-      findOne: ['user/me']
-      update: ['isAuth', 'isOwner']
+      findOne: ['me']
+      update: ['isAuth', 'me', 'canUpdate']
