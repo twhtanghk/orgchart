@@ -1,4 +1,4 @@
 module.exports = 
-	blueprints:
-		autoWatch:	false
-		prefix:		'/api'
+  blueprints:
+    autoWatch: false
+    prefix: '/api'

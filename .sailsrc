@@ -4,7 +4,12 @@
   },
   "hooks": {
     "grunt": false,
+    "i18n": false,
     "csrf": false,
-    "session": false
+    "cors": false,
+    "views": false
+  },
+  "paths": {
+    "public": "www"
   }
 }

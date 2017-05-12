@@ -1,10 +1,7 @@
 module.exports = 
-	policies:
-		UserController:
-			'*':		false
-			find:		true
-			findOne:	['isAuthMe', 'user/me']
-			update:		['isAuth', 'user/addSuper']
-			findOauth2User:		['isAuth']
-			findPageableUser:	true
-			findForSelect: ['isAuth', 'user/isAdmin']
+  policies:
+    UserController:
+      '*': false
+      find: true
+      findOne: ['user/me']
+      update: ['isAuth', 'isOwner']
