@@ -1,19 +1,16 @@
-FROM node:4-slim
+FROM node
 
-WORKDIR /usr/src/app
+ENV VER=${VER:-master} \
+    REPO=https://github.com/ewnchui/orgchart \
+    APP=/usr/src/app
 
-ADD https://github.com/ewnchui/orgchart/archive/master.tar.gz /tmp
+WORKDIR $APP
 
-RUN apt-get update && \  
-	apt-get -y install git && \
-	apt-get clean && \
-	cd /usr/src/app && \
-	tar --strip-components=1 -xzf /tmp/master.tar.gz && \
-	rm /tmp/master.tar.gz && \
-	npm install bower coffee-script -g && \
-	npm install && \
-	bower install --allow-root
+RUN git clone -b $VER $REPO $APP \
+&&  npm install \
+&&  node_modules/.bin/bower install --allow-root
 	
+
 EXPOSE 1337
 
 ENTRYPOINT ./entrypoint.sh
