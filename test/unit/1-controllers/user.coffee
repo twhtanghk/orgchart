@@ -8,8 +8,8 @@ Promise = require 'bluebird'
   'USER1_SECRET'
   'USER2_ID'
   'USER2_SECRET'
-  'CLIENT_ID'
-  'CLIENT_SECRET'
+  'PASS_CLIENT_ID'
+  'PASS_CLIENT_SECRET'
   'TOKENURL'
   'VERIFYURL'
   'SCOPE'
@@ -21,11 +21,12 @@ describe 'user', ->
     { id: process.env.USER1_ID, secret: process.env.USER1_SECRET }
     { id: process.env.USER2_ID, secret: process.env.USER2_SECRET }
   ]
+  admin = users[0]
 
   before ->
     client =
-      id: process.env.CLIENT_ID
-      secret: process.env.CLIENT_SECRET
+      id: process.env.PASS_CLIENT_ID
+      secret: process.env.PASS_CLIENT_SECRET
     scope = process.env.SCOPE.split ' '
     Promise
       .map users, (user) ->
@@ -34,8 +35,8 @@ describe 'user', ->
           .then (token) ->
             _.extend user, token: token
             oauth2.verify process.env.VERIFYURL, scope, token
-          .then (info) ->
-            _.extend user, info.user
+          .then (curr) ->
+            _.extend user, curr.user
 
   it 'update subordinates', ->
     Promise.map users, (user) ->
@@ -45,9 +46,23 @@ describe 'user', ->
         .send subordinates: []
         .expect 200
 
-  it 'update supervisor', ->
+  it 'update supervisor by owner', ->
     req sails.hooks.http.app
       .put '/api/user/me'
+      .set 'Authorization', "Bearer #{users[1].token}"
+      .send supervisor: users[0].email
+      .expect 200
+
+  it 'update supervisor by admin', ->
+    req sails.hooks.http.app
+      .put '/api/user/users[1].email"
       .set 'Authorization', "Bearer #{users[0].token}"
       .send supervisor: users[1].email
       .expect 200
+
+  it 'update supervisor by non-admin', ->
+    req sails.hooks.http.app
+      .put '/api/user/me'
+      .set 'Authorization', "Bearer #{users[1].token}"
+      .send supervisor: users[0].email
+      .expect 401
