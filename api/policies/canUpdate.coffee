@@ -1,13 +1,17 @@
-if not ('ADMIN' of process.env)
-  throw new Error "process.env.ADMIN not yet defined"
+assert = require 'assert'
+actionUtil = require 'sails/lib/hooks/blueprints/actionUtil'
+
+[
+  'ADMIN'
+].map (name) ->
+  assert name of process.env, "process.env.#{name} not yet defined"
 
 module.exports = (req, res, next) ->
-  # check if authenticated user is admin
+  pk = actionUtil.requirePk req
   admin = process.env.ADMIN.split ','
-  if req.user.email in admin
+
+  # check if authenticated user is admin or the same user to be updated
+  if req.user.email in admin or pk == req.user.email
     return next()
 
-  # check if authenticated user is owner
-  req.options.where = req.options.where || {}
-  _.extend req.options.where, createdBy: req.user
-  next()
+  res.forbidden()

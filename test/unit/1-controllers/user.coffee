@@ -21,7 +21,7 @@ describe 'user', ->
     { id: process.env.USER1_ID, secret: process.env.USER1_SECRET }
     { id: process.env.USER2_ID, secret: process.env.USER2_SECRET }
   ]
-  admin = users[0]
+  admin = users[0] # assume users[0] to be defined as admin
 
   before ->
     client =
@@ -55,14 +55,14 @@ describe 'user', ->
 
   it 'update supervisor by admin', ->
     req sails.hooks.http.app
-      .put '/api/user/users[1].email"
+      .put "/api/user/#{users[1].email}"
       .set 'Authorization', "Bearer #{users[0].token}"
       .send supervisor: users[1].email
       .expect 200
 
   it 'update supervisor by non-admin', ->
     req sails.hooks.http.app
-      .put '/api/user/me'
+      .put "/api/user/#{users[0].email}"
       .set 'Authorization', "Bearer #{users[1].token}"
-      .send supervisor: users[0].email
-      .expect 401
+      .send supervisor: users[1].email
+      .expect 403
