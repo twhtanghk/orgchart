@@ -1,23 +1,13 @@
 gulp = require 'gulp'
 browserify = require 'browserify'
 source = require 'vinyl-source-stream'
-sass = require 'gulp-sass'
-minifyCss = require 'gulp-minify-css'
 rename = require 'gulp-rename'
+uglify = require 'gulp-uglify'
+streamify = require 'gulp-streamify'
 
 paths = sass: ['./scss/**/*.scss']
 
-gulp.task 'default', ['sass', 'coffee']
-
-gulp.task 'sass', (done) ->
-  gulp.src('./scss/ionic.app.scss')
-    .pipe(sass())
-    .pipe(gulp.dest('./www/css/'))
-    .pipe(minifyCss({
-      keepSpecialComments: 0
-    }))
-    .pipe(rename({ extname: '.min.css' }))
-    .pipe(gulp.dest('./www/css/'))
+gulp.task 'default', ['coffee']
 
 gulp.task 'coffee', ->
   browserify entries: ['./www/js/index.coffee']
@@ -25,4 +15,7 @@ gulp.task 'coffee', ->
     .transform 'debowerify'
     .bundle()
     .pipe source 'index.js'
+    .pipe gulp.dest 'www/js'
+    .pipe streamify uglify()
+    .pipe rename extname: '.min.js'
     .pipe gulp.dest 'www/js'
