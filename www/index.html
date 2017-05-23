@@ -4,44 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <title>Organization Chart</title>
-    
-	<link rel="icon" type="image/png" href="img/icon.png" />
-    <link href="lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/ionic.app.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="lib/angular-tree-control/css/tree-control.css">
-    <link rel="stylesheet" type="text/css" href="lib/angular-tree-control/css/tree-control-attribute.css">
-
-    <!-- ionic/angularjs js -->
-    <script src="lib/ionic/js/ionic.bundle.js"></script>
-     
-    <script src="lib/angular-filter/dist/angular-filter.min.js"></script>
-        
-	<!-- util.auth -->
-	<script type="text/javascript" src="lib/sails.io.js/dist/sails.io.js"></script>
-	<script type="text/javascript">
-			io.sails.autoConnect = false;
-	</script> 	
-
-	<!-- angularSails -->
-	<script src="lib/angularSails/dist/ngsails.io.js" ></script>     
-    
-    <!-- angularTreeview -->
-	<!--<script src="lib/angular-treeview/angular.treeview.js" ></script> -->
-	<script type="text/javascript" src="lib/angular-tree-control/angular-tree-control.js"></script>   
-    
-    <!-- angularXeditable -->
-    <script src="lib/angular-xeditable/dist/js/xeditable.js" ></script>
-    
-    <!-- angular-Ui-Select -->
-    <script src="lib/angular-ui-select/dist/select.min.js"></script>
-    <script src="lib/angular-scroll-complete/angular-scroll-complete.js"></script>
-    
-    <!-- your app's js -->
-    <script src="js/index.js"></script>
-
+    <link rel="icon" type="image/png" href="img/icon.png" />
   </head>
 
-  <body ng-app="starter">
-    <ion-nav-view></ion-nav-view>
+  <body>
+    <div id='root'></div>
+    <script src="js/index.js"></script>
   </body>
 </html>
