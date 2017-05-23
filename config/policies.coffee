@@ -2,6 +2,6 @@ module.exports =
   policies:
     UserController:
       '*': false
-      find: true
+      find: ['supervisor']
       findOne: ['me']
       update: ['isAuth', 'me', 'canUpdate']
