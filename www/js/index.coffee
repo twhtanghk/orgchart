@@ -1,3 +1,4 @@
+require './css'
 redux = require 'redux'
 thunk = require('redux-thunk').default
 React = require 'react'

@@ -69,6 +69,8 @@
   "license": "",
   "devDependencies": {
     "browserify": "^14.3.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-css-to-js": "0.0.2",
     "gulp-streamify": "^1.0.2",
     "gulp-uglify": "^3.0.0",
     "supertest-as-promised": "^4.0.2"
