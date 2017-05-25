@@ -11,8 +11,6 @@ module.exports = (req, res) ->
   query = Model
     .find()
     .where cond
-    .limit actionUtil.parseLimit req
-    .skip actionUtil.parseSkip req
     .sort actionUtil.parseSort req
     .toPromise()
 
