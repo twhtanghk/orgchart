@@ -7,7 +7,6 @@ module.exports = (req, res) ->
 
   count = Model
     .count()
-    .where cond
     .toPromise()
   query = Model
     .find()
