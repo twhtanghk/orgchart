@@ -1,3 +1,4 @@
+_ = require 'lodash'
 require './css'
 redux = require 'redux'
 thunk = require('redux-thunk').default
@@ -13,7 +14,10 @@ store = createStore reducers, {}, window.__REDUX_DEVTOOLS_EXTENSION__ && window.
 
 mapStateToProps = (state) ->
   users: state.users
-Tree = connect(mapStateToProps)(view.Users)
-tree = React.createElement Tree, {}
+Users = connect(mapStateToProps)(view.Users)
+tree = React.createElement Users, 
+  showLine: true
+  loadData: (node) ->
+    store.dispatch rest.actions.user.get _.pick node.props, 'email'
 elem = React.createElement Provider, store: store, tree
 ReactDOM.render elem, document.getElementById 'root'

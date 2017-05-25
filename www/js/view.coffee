@@ -4,18 +4,24 @@ rest = require './model.coffee'
 Tree = require 'rc-tree'
 _ = require 'lodash'
 
-class User extends Tree.TreeNode
-
 class Users extends Tree
   componentDidMount: ->
-    @props.dispatch rest.actions.users.sync()
+    @props.dispatch rest.actions.users.sync sort: 'email ASC'
 
   render: ->
-    React.createElement Tree, {}, @props.users.data?.results?.map (user) ->
-      defaults =
-        key: user.id
+    React.createElement Tree, @props, @props.users.data?.results?.map (user) ->
+      children = user.subordinates?.map (user) ->
+        React.createElement Tree.TreeNode, _.defaults user,
+          key: user.email
+          title: user.email
+          isLeaf: false
+          expanded: false
+      props = _.defaults user,
+        key: user.email
         title: user.email
-      React.createElement User, _.extend defaults, user
+        isLeaf: false
+        expanded: false
+      React.createElement Tree.TreeNode, props, children
 
 module.exports =
   Users: Users
