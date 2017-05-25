@@ -6,7 +6,7 @@ _ = require 'lodash'
 
 class Users extends Tree
   componentDidMount: ->
-    @props.dispatch rest.actions.users.sync sort: 'email ASC'
+    @props.dispatch rest.actions.users.sync()
 
   render: ->
     React.createElement Tree, @props, @props.users.data?.results?.map (user) ->
