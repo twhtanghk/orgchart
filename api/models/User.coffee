@@ -11,7 +11,8 @@ module.exports =
   attributes:
 
     email:
-      type: 'string'
+      type: 'email'
+      unique: true
       primaryKey: true
 
     supervisor:
