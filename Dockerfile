@@ -7,9 +7,7 @@ ENV VER=${VER:-master} \
 WORKDIR $APP
 
 RUN git clone -b $VER $REPO $APP \
-&&  npm install \
-&&  node_modules/.bin/bower install --allow-root
-	
+&&  npm install
 
 EXPOSE 1337
 
