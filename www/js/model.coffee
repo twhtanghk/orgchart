@@ -45,7 +45,7 @@ rest = reduxApi
 rest
   .use 'fetch', adapter fetch
   .use 'server', true
-  .use 'rootUrl', 'https://mppsrc.ogcio.hksarg/twhtang/mpp'
+  .use 'rootUrl', location.href
   .use 'options', (url, params, getState) ->
     headers:
       Accept: 'application/json'
