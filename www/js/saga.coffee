@@ -16,12 +16,18 @@ users =
           type: 'users.get.ok'
           data: data
       else
-        yield put Object.assign type: 'users.get.err', res.body
+        yield put Object.assign type: 'users.get.err', error: yield res.json()
 
 user =
   get: ->
     yield takeEvery 'user.get', (action) ->
-      yield api.get "/user/#{action.email}"
+      res = yield api.get "/user/#{action.email}"
+      if res.ok
+        yield put Object.assign
+          type: 'user.get.ok'
+          data: yield res.json()
+      else
+        yield put Object.assign type: 'user.get.err', error: yield res.json()
 
 module.exports = ->
   yield race [

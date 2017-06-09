@@ -40,6 +40,9 @@ reducer = (state, action) ->
     when 'users.get.ok'
       user: state.user
       users: action.data
+    when 'user.get.ok'
+      user: action.data
+      users: state.users
     else
       state || initState
 
