@@ -5,7 +5,6 @@ rest = require './model.coffee'
 Tree = require 'rc-tree'
 Dialog = require 'rc-dialog'
 update = require 'react-addons-update'
-Promise = require 'bluebird'
 
 class Users extends React.Component
   @defaultProps:
@@ -20,16 +19,6 @@ class Users extends React.Component
       if oldSup == newSup
         return
       @putUser email: opts.dragNode.props.email, supervisor: opts.node.props.email
-        .then =>
-          if oldSup?
-            @getUser oldSup
-          else
-            @getUsers()
-        .then =>
-          @getUser newSup
-        .catch (err) ->
-          if err != 'Unauthorized'
-            Promise.reject err
 
   componentDidMount: ->
     @props.getUsers()
@@ -38,8 +27,32 @@ class Users extends React.Component
     node = (user) ->
       props = Object.assign {key: user.email, title: user.email}, user
       E Tree.TreeNode, props, user.subordinates?.map node
-    E Tree, @props, @props.users.data?.results?.map node
+    E Tree, @props, @props.users.results?.map node
 
+initState =
+  users: 
+    count: 0
+    result: []
+  user: {}
+
+reducer = (state, action) ->
+  switch action.type
+    when 'users.get.ok'
+      user: state.user
+      users: action.data
+    else
+      state || initState
+
+actionCreator = (dispatch) ->
+  getUsers: ->
+    dispatch type: 'users.get'
+  getUser: (email) ->
+    dispatch type: 'user.get', email: email
+  putUser: (email, supervisor) ->
+    dispatch type: 'user.put', {email: email}, {supervisor: supervisor}
+      
 module.exports =
-  Auth: require 'rc-oauth2'
-  Users: Users
+  component: Users
+  state: initState
+  reducer: reducer
+  actionCreator: actionCreator

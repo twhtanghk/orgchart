@@ -41,6 +41,3 @@ gulp.task 'coffee', ['config', 'css'],  ->
       .bundle()
       .pipe source "#{name}.js"
       .pipe gulp.dest 'www/js'
-      .pipe streamify uglify()
-      .pipe rename extname: '.min.js'
-      .pipe gulp.dest 'www/js'

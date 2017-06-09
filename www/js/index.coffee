@@ -1,46 +1,35 @@
 _ = require 'lodash'
 require './css'
-redux = require 'redux'
-thunk = require('redux-thunk').default
+{createStore, combineReducers, applyMiddleware} = require 'redux'
 React = require 'react'
 E = require 'react-script'
 ReactDOM = require 'react-dom'
 {Provider, connect} = require 'react-redux'
-view = require './view.coffee'
 rest = require './model.coffee'
 update = require 'react-addons-update'
 middleware = require './middleware.coffee'
-reducer = require './reducer.coffee'
+createSagaMiddleware = require('redux-saga').default
+Auth = require 'rc-oauth2'
+User = require './user.coffee'
 
-reducers = redux.combineReducers Object.assign {}, rest.reducers, reducer
-
-createStore = redux.applyMiddleware(thunk, middleware)(redux.createStore)
 initState =
-  users: {}
-  user: {}
-  auth:
-    visible: false
-    token: null
-store = createStore reducers, initState, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+  auth: Auth.state
+  data: User.state
 
-mapDispatchToProps = (dispatch) ->
-  login: ->
-    dispatch type: 'login'
-  loginReject: (err) ->
-    dispatch type: 'loginReject', error: err
-  loginResolve: (token) ->
-    dispatch type: 'loginResolve', token: token
-  logout: ->
-    dispatch type: 'logout'
-  getUsers: ->
-    dispatch rest.actions.users.sync()
-  getUser: (email) ->
-    dispatch rest.actions.user.get email: email
-  putUser: (data) ->
-    dispatch rest.actions.user.put {email: data.email}, {body: JSON.stringify supervisor: data.supervisor}
+reducer = combineReducers
+  auth: Auth.reducer
+  data: User.reducer
 
-Auth = connect(((state) -> state.auth), mapDispatchToProps)(view.Auth)
-Users = connect(((state) -> users: state.users), mapDispatchToProps)(view.Users)
+composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+
+sagaMiddleware = createSagaMiddleware()
+
+store = createStore reducer, initState, composeEnhancers applyMiddleware sagaMiddleware, middleware
+
+sagaMiddleware.run require './saga.coffee'
+
+Auth = connect(((state) -> state.auth), Auth.actionCreator)(Auth.component)
+Users = connect(((state) -> state.data), User.actionCreator)(User.component)
 
 elem =
   E Provider, store: store,
