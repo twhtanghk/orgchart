@@ -35,7 +35,11 @@ authMiddleware = -> (req, next) ->
 
   res = yield next new Request(req, { headers })
   ret = detail: res
-  body = yield res.json()
+  try 
+    body = yield res.json()
+  catch error
+    body = res.statusText
+    
   return yield Object.assign ret, if res.ok then data: body else error: body
 
 module.exports = new API "#{location.href}/api"
