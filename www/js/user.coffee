@@ -5,7 +5,30 @@ rest = require './model.coffee'
 Tree = require 'rc-tree'
 Dialog = require 'rc-dialog'
 update = require 'react-addons-update'
+Promise = require 'bluebird'
+_ = require 'lodash'
 
+find = (user, users) ->
+  cb = (initVal, node) ->
+    if initVal?
+      initVal
+    else if node.email == user.email
+      node
+    else
+      _.reduce node.subordinates, cb, initVal
+  _.reduce users.results, cb, null
+
+merge = (user, users) ->
+  cb = (node) ->
+    if node.email == user.email
+      update node, $merge: user
+    else
+      node.subordinates = _.map node.subordinates, cb
+      node
+  update users, 
+    results: 
+      $merge: _.map users.results, cb
+           
 class Users extends React.Component
   @defaultProps:
     showLine: true
@@ -18,7 +41,7 @@ class Users extends React.Component
       newSup = opts.node.props.email
       if oldSup == newSup
         return
-      @putUser email: opts.dragNode.props.email, supervisor: opts.node.props.email
+      @putUser opts.dragNode.props.email, opts.node.props.email
 
   componentDidMount: ->
     @props.getUsers()
@@ -42,7 +65,10 @@ reducer = (state, action) ->
       users: action.data
     when 'user.get.ok'
       user: action.data
-      users: state.users
+      users: merge action.data, state.users
+    when 'user.put.ok'
+      user: action.data
+      users: merge action.data, state.users
     else
       state || initState
 
@@ -51,11 +77,17 @@ actionCreator = (dispatch) ->
     dispatch type: 'users.get'
   getUser: (email) ->
     dispatch type: 'user.get', email: email
+    Promise.resolve()
   putUser: (email, supervisor) ->
-    dispatch type: 'user.put', {email: email}, {supervisor: supervisor}
+    dispatch Object.assign type: 'user.put', 
+      email: email
+      supervisor: supervisor
       
 module.exports =
   component: Users
   state: initState
   reducer: reducer
   actionCreator: actionCreator
+  util:
+    find: find
+    merge: merge
