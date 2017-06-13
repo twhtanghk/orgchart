@@ -30,8 +30,12 @@ user =
           type: 'user.get.err'
           error: res.error
         else
+          # sort subordinates by email in lowercase
+          res.data.subordinates = _.sortBy res.data.subordinates, (user) ->
+            user.email.toLowerCase()
+
           type: 'user.get.ok'
-          data: yield res.data
+          data: res.data
       yield put action
   put: ->
     yield takeEvery 'user.put', (action) ->
@@ -63,7 +67,7 @@ user =
             email: res.data.supervisor.email
 
           type: 'user.put.ok'
-          data: yield res.data
+          data: res.data
       yield put action
 
 module.exports = ->
