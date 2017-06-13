@@ -37,7 +37,7 @@ class Users extends React.Component
       @getUser node.props.email
     onDrop: (opts) ->
       oldSup = opts.dragNode.props.supervisor
-      oldSup = oldSup.email || oldSup
+      oldSup = oldSup?.email || oldSup
       newSup = opts.node.props.email
       if oldSup == newSup
         return

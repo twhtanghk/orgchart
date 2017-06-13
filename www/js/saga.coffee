@@ -51,9 +51,13 @@ user =
             state.data.users
           supervisor = User.util.find(res.data, users).supervisor
           supervisor = supervisor?.email || supervisor
-          yield put
-            type: 'user.get'
-            email: supervisor
+          if supervisor?
+            yield put
+              type: 'user.get'
+              email: supervisor
+          else
+            yield put
+              type: 'users.get'
           yield put
             type: 'user.get'
             email: res.data.supervisor.email

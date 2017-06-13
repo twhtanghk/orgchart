@@ -7,7 +7,6 @@ ReactDOM = require 'react-dom'
 {Provider, connect} = require 'react-redux'
 rest = require './model.coffee'
 update = require 'react-addons-update'
-middleware = require './middleware.coffee'
 createSagaMiddleware = require('redux-saga').default
 Auth = require 'rc-oauth2'
 User = require './user.coffee'
@@ -24,7 +23,7 @@ composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 sagaMiddleware = createSagaMiddleware()
 
-store = createStore reducer, initState, composeEnhancers applyMiddleware sagaMiddleware, middleware
+store = createStore reducer, initState, composeEnhancers applyMiddleware sagaMiddleware
 
 sagaMiddleware.run require './saga.coffee'
 
