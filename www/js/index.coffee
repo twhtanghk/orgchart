@@ -1,6 +1,6 @@
 _ = require 'lodash'
 require './css'
-{createStore, combineReducers, applyMiddleware} = require 'redux'
+{compose, createStore, combineReducers, applyMiddleware} = require 'redux'
 React = require 'react'
 E = require 'react-script'
 ReactDOM = require 'react-dom'
