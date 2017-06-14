@@ -17,7 +17,7 @@ _ = require 'lodash'
 ].map (name) ->
   assert name of process.env, "process.env.#{name} not yet defined"
 
-before (done) ->
+before ->
   users =
     id: process.env.USER_ID.split ','
     secret: process.env.USER_SECRET.split ','
@@ -29,7 +29,7 @@ before (done) ->
     id: process.env.PASS_CLIENT_ID
     secret: process.env.PASS_CLIENT_SECRET
   scope = process.env.SCOPE.split ' '
-  usersReady = Promise
+  Promise
     .map users, (user) ->
       oauth2
         .token process.env.TOKENURL, client, user, scope
@@ -40,19 +40,11 @@ before (done) ->
           _.extend user, curr.user
     .then (users) ->
       global.users = users
-  sailsReady = Sails
-    .liftAsync config
+    .then ->
+      Sails.liftAsync config
     .then (sails) ->
       global.sails = sails
-  Promise
-    .all [usersReady, sailsReady]
-    .then ->
-      done()
-    .catch done
 
-after (done) ->
+after ->
   Sails
     .lowerAsync()
-    .then ->
-      done()
-    .catch done
