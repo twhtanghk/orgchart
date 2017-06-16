@@ -1,5 +1,5 @@
+require 'rc-tree/assets/index.css'
 _ = require 'lodash'
-require './css'
 {compose, createStore, combineReducers, applyMiddleware} = require 'redux'
 React = require 'react'
 E = require 'react-script'
@@ -33,7 +33,10 @@ Users = connect(((state) -> state.data), User.actionCreator)(User.component)
 elem =
   E Provider, store: store,
     E 'div', {},
-      E Auth, require './config.json'
+      E Auth, 
+        AUTHURL: process.env.AUTHURL
+        CLIENT_ID: process.env.CLIENT_ID
+        SCOPE: process.env.SCOPE
       E Users
 
 ReactDOM.render elem, document.getElementById 'root'
