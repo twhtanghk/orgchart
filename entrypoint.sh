@@ -1,4 +1,4 @@
 #!/bin/sh
 
-node_modules/.bin/gulp
+npm run build
 node app.js --prod
