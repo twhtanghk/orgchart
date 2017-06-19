@@ -1,33 +1,15 @@
 version: '2'
 services:
-  orgchart_mongo:
-    hostname: orgchart_mongo
-    container_name: orgchart_mongo
-    image: mongo
-    ports:
-      - 27017
-    volumes:
-      - ${COMPOSEROOT}/orgchart_data:/data/db 
-    command: mongod --directoryperdb
-    env_file:
-      - ../.env
-    
   orgchart:
-    hostname: orgchart
-    container_name: orgchart
-    depends_on:
-      - orgchart_mongo
     image: ewnchui/orgchart
+    networks:
+      - mongo_default
     ports:
-      - 8020:1337
-      - 8022:8080
-    entrypoint: top -b -d 1000  
-    volumes:
-      #- ${COMPOSEROOT}/orgchart82/config/env/development.coffee:/usr/src/app/config/env/development.coffee
-      #- ${COMPOSEROOT}/orgchart82/www/js/config/development.coffee:/usr/src/app/www/js/config/development.coffee
-      - /etc/ssl/certs:/etc/ssl/certs
-      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
-      #- ${COMPOSEROOT}/orgchart82/entrypoint.sh:/usr/src/app/entrypoint.sh
-      - ${COMPOSEROOT}/orgchart82:/usr/src/app
+      - 1337
     env_file:
-      - ./.env      
+      - ./.env
+      - ../.env
+
+networks:
+  mongo_default:
+    external: true
