@@ -10,6 +10,8 @@ update = require 'react-addons-update'
 createSagaMiddleware = require('redux-saga').default
 Auth = require 'rc-oauth2'
 User = require './user.coffee'
+MuiThemeProvider = require('material-ui/styles/MuiThemeProvider').default
+require('react-tap-event-plugin')()
 
 initState =
   auth: Auth.state
@@ -32,11 +34,12 @@ Users = connect(((state) -> state.data), User.actionCreator)(User.component)
 
 elem =
   E Provider, store: store,
-    E 'div', {},
-      E Auth, 
-        AUTHURL: process.env.AUTHURL
-        CLIENT_ID: process.env.CLIENT_ID
-        SCOPE: process.env.SCOPE
-      E Users
+    E MuiThemeProvider,
+      E 'div', 
+        E Auth,
+          AUTHURL: process.env.AUTHURL
+          CLIENT_ID: process.env.CLIENT_ID
+          SCOPE: process.env.SCOPE
+        E Users
 
 ReactDOM.render elem, document.getElementById 'root'

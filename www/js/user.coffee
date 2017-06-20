@@ -1,3 +1,4 @@
+require '../css/index.css'
 React = require 'react'
 E = require 'react-script'
 rest = require './model.coffee'
@@ -5,6 +6,9 @@ Tree = require 'rc-tree'
 update = require 'react-addons-update'
 Promise = require 'bluebird'
 _ = require 'lodash'
+FloatingActionButton = require('material-ui/FloatingActionButton').default
+AddIcon = require('material-ui/svg-icons/content/add').default
+DeleteIcon = require('material-ui/svg-icons/action/delete').default
 
 find = (user, users) ->
   cb = (initVal, node) ->
@@ -48,7 +52,16 @@ class Users extends React.Component
     node = (user) ->
       props = Object.assign {key: user.email, title: user.email}, user
       E Tree.TreeNode, props, user.subordinates?.map node
-    E Tree, @props, @props.users.results?.map node
+    E 'div',
+      E Tree, @props, @props.users.results?.map node
+      E FloatingActionButton, 
+        secondary: true
+        className: 'fab delete',
+        E DeleteIcon
+      E FloatingActionButton, 
+        secondary: true
+        className: 'fab add',
+        E AddIcon
 
 initState =
   users: 
