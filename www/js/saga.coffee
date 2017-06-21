@@ -22,6 +22,22 @@ users =
       yield put action 
 
 user =
+  post: ->
+    yield takeEvery 'user.post', (action) ->
+      res = yield api.post '/user', email: action.email
+      action =
+        if res.error?
+          type: 'user.post.err'
+          error: res.error
+        else
+          yield put 
+            type: 'users.get'
+            email: action.email
+
+          type: 'user.post.ok'
+          data: res.data
+
+      yield put action
   get: ->
     yield takeEvery 'user.get', (action) ->
       res = yield api.get "/user/#{action.email}"
@@ -82,6 +98,7 @@ user =
 module.exports = ->
   yield race [
     call users.get
+    call user.post
     call user.get
     call user.put
     call user.del

@@ -27,7 +27,7 @@ yield
 authMiddleware = -> (req, next) ->
   headers = req.headers || new Headers()
 
-  if req.method in ['PUT', 'DELETE']
+  if req.method in ['POST', 'PUT', 'DELETE']
     { error, token } = yield call auth
     if error?
       return yield error: error
