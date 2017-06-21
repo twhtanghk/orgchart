@@ -5,3 +5,4 @@ module.exports =
       find: ['supervisor']
       findOne: ['me']
       update: ['isAuth', 'me', 'canUpdate']
+      destroy: ['isAuth', 'me', 'canUpdate']
