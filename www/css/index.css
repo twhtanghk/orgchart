@@ -1,0 +1,15 @@
+.fab {
+  margin: 0px;
+  top: auto;
+  right: 20px;
+  left: auto;
+  position: fixed;
+}
+
+.fab.delete {
+  bottom: 100px;
+}
+
+.fab.add {
+  bottom: 20px;
+}
