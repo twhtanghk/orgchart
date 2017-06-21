@@ -14,6 +14,7 @@ module.exports =
     email:
       type: 'email'
       unique: true
+      required: true
       primaryKey: true
 
     supervisor:
