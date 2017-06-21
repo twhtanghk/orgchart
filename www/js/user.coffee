@@ -35,6 +35,8 @@ class Users extends React.Component
   @defaultProps:
     showLine: true
     draggable: true
+    checkable: true
+    checkStrictly: true
     loadData: (node) ->
       @getUser node.props.email
     onDrop: (opts) ->
@@ -48,13 +50,23 @@ class Users extends React.Component
   componentDidMount: ->
     @props.getUsers()
 
+  onCheck: (checkedKeys) =>
+    @checkedKeys = checkedKeys
+
+  del: =>
+    @checkedKeys.checked.map (user) =>
+      @props.delUser user
+
   render: ->
     node = (user) ->
       props = Object.assign {key: user.email, title: user.email}, user
       E Tree.TreeNode, props, user.subordinates?.map node
     E 'div',
-      E Tree, @props, @props.users.results?.map node
+      E Tree, 
+        Object.assign(onCheck: @onCheck, @props),
+        @props.users.results?.map node
       E FloatingActionButton, 
+        onTouchTap: @del
         secondary: true
         className: 'fab delete',
         E DeleteIcon
@@ -87,12 +99,19 @@ actionCreator = (dispatch) ->
   getUsers: ->
     dispatch type: 'users.get'
   getUser: (email) ->
-    dispatch type: 'user.get', email: email
+    dispatch 
+      type: 'user.get'
+      email: email
     Promise.resolve()
   putUser: (email, supervisor) ->
-    dispatch Object.assign type: 'user.put', 
+    dispatch
+      type: 'user.put'
       email: email
       supervisor: supervisor
+  delUser: (email) ->
+    dispatch 
+      type: 'user.del'
+      email: email
       
 module.exports =
   component: Users

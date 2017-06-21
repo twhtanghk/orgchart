@@ -42,11 +42,6 @@ user =
       res = yield api.put "/user/#{action.email}", supervisor: action.supervisor
       action = 
         if res.error?
-          # clear error or token
-          # if existing error is access_denied or Unauthorized
-          if res.error in ['access_denied', 'Unauthorized']
-            yield put type: 'logout'
-
           type: 'user.put.err'
           error: res.error
         else
@@ -69,10 +64,25 @@ user =
           type: 'user.put.ok'
           data: res.data
       yield put action
+  del: ->
+    yield takeEvery 'user.del', (action) ->
+      res = yield api.del "/user/#{action.email}"
+      action =
+        if res.error?
+          type: 'user.del.err'
+          error: res.error
+        else
+          yield put
+            type: 'users.get'
+
+          type: 'user.del.ok'
+          data: res.data
+      yield put action
 
 module.exports = ->
   yield race [
     call users.get
     call user.get
     call user.put
+    call user.del
   ]

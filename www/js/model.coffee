@@ -27,7 +27,7 @@ yield
 authMiddleware = -> (req, next) ->
   headers = req.headers || new Headers()
 
-  if req.method == 'PUT'
+  if req.method in ['PUT', 'DELETE']
     { error, token } = yield call auth
     if error?
       return yield error: error
@@ -42,5 +42,16 @@ authMiddleware = -> (req, next) ->
     
   return yield Object.assign ret, if res.ok then data: body else error: body
 
+logoutIfDeny = -> (req, next) ->
+  res = yield next req
+  if res.error?
+    # clear error or token
+    # if existing err is access_denied or Unauthorized
+    if res.error in ['access_denied', 'Unauthorized']
+      yield put type: 'logout'
+
+  return res
+
 module.exports = new API "#{location.href}/api"
   .use authMiddleware()
+  .use logoutIfDeny()
