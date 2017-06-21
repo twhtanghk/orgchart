@@ -1,4 +1,5 @@
 _ = require 'lodash'
+Promise = require 'bluebird'
 
 module.exports =
   
@@ -81,3 +82,16 @@ module.exports =
                   cb()
     else
       cb()
+
+  beforeDestroy: (criteria, cb) ->
+    sails.models.user
+      .find criteria
+      .populate 'subordinates'
+      .then (users) ->
+        Promise.map users, (user) ->
+          Promise.map user.subordinates, (subordinate) ->
+            subordinate.supervisor = null
+            subordinate.save().then Promise.resolve, Promise.reject
+      .then ->
+        cb()
+      .catch cb
