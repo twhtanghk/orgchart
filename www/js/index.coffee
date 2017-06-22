@@ -6,7 +6,6 @@ React = require 'react'
 E = require 'react-script'
 ReactDOM = require 'react-dom'
 {Provider, connect} = require 'react-redux'
-rest = require './model.coffee'
 update = require 'react-addons-update'
 createSagaMiddleware = require('redux-saga').default
 Auth = require 'rc-oauth2'
