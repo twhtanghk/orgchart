@@ -78,6 +78,7 @@ class Users extends React.Component
     checkStrictly: true
     loadData: (node) ->
       @getUser node.props.email
+      Promise.resolve()
     onDrop: (opts) ->
       oldSup = opts.dragNode.props.supervisor
       oldSup = oldSup?.email || oldSup
@@ -159,7 +160,6 @@ actionCreator = (dispatch) ->
     dispatch 
       type: 'user.get'
       email: email
-    Promise.resolve()
   putUser: (email, supervisor) ->
     dispatch
       type: 'user.put'
