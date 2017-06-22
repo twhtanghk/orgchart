@@ -1,6 +1,8 @@
+util = require 'util'
 { call, put, take, select } = require 'redux-saga/effects'
 require 'regenerator-runtime/runtime'
 { API } = require 'redux-saga-rest'
+{ toastr } = require 'react-redux-toastr'
 
 auth = ->
   while true
@@ -24,7 +26,7 @@ yield
   data: rest api res.json() data
   detail: ressponse object with detail
 ###
-authMiddleware = -> (req, next) ->
+authMiddleware = (req, next) ->
   headers = req.headers || new Headers()
 
   if req.method in ['POST', 'PUT', 'DELETE']
@@ -42,7 +44,7 @@ authMiddleware = -> (req, next) ->
     
   return yield Object.assign ret, if res.ok then data: body else error: body
 
-logoutIfDeny = -> (req, next) ->
+logoutIfDeny = (req, next) ->
   res = yield next req
   if res.error?
     # clear error or token
@@ -52,6 +54,15 @@ logoutIfDeny = -> (req, next) ->
 
   return res
 
+error = (req, next) ->
+  res = yield next req
+  if res.error?
+    msg = if typeof res.error.message == 'string' then res.error.message else util.inspect res.error
+    toastr.error msg
+
+  return res
+
 module.exports = new API "#{location.href}/api"
-  .use authMiddleware()
-  .use logoutIfDeny()
+  .use authMiddleware
+  .use logoutIfDeny
+  .use error
