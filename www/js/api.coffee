@@ -7,7 +7,7 @@ orderByEmail = (users) ->
   _.sortBy users, (user) ->
     user.email.toLowerCase()
 
-module.exports =
+api =
   users:
     get: ->
       res = yield rest.get '/user'
@@ -16,9 +16,14 @@ module.exports =
         data = res.data
         data.results = orderByEmail data.results
 
-        yield put
-          type: 'users.get.ok'
-          data: data
+        return res.data
+
+    expand: (users) ->
+      res = yield all users?.map (user) ->
+        data = yield api.user.get user.email
+        data.subordinates = yield api.users.expand data.subordinates
+        data
+      return res
 
   user:
     post: (email) ->
@@ -27,18 +32,16 @@ module.exports =
         yield put
           type: 'users.get'
 
-        yield put
-          type: 'user.post.ok'
-          data: res.data
+        return res.data
+
     get: (email) ->
       res = yield rest.get "/user/#{email}"
       if not res.error?
         # sort subordinates by email in lowercase
         res.data.subordinates = orderByEmail res.data.subordinates
 
-        yield put
-          type: 'user.get.ok'
-          data: res.data
+        return res.data
+
     put: (email, supervisor) ->
       res = yield rest.put "/user/#{email}", supervisor: supervisor
       if not res.error?
@@ -58,9 +61,8 @@ module.exports =
           type: 'user.get'
           email: res.data.supervisor.email
 
-        yield put
-          type: 'user.put.ok'
-          data: res.data
+        return res.data
+
     del: (email) ->
       res = yield rest.del "/user/#{email}"
       if not res.error?
@@ -68,12 +70,49 @@ module.exports =
         yield put
           type: 'users.get'
 
-        # refresh all subordinates
-        yield all res.data.subordinates.map (subordinate) ->
-          yield put
-            type: 'user.get'
-            email: subordinate.email
+        return res.data
 
+module.exports =
+  users:
+    get: ->
+      res = yield api.users.get()
+      if res?
+        yield put
+          type: 'users.get.ok' 
+          data: res
+
+    expand: (users) ->
+      res = yield api.users.expand users
+      if res?
+        yield put
+          type: 'users.expand.ok'
+          data: res
+
+  user:
+    post: (email) ->
+      res = yield api.user.post email
+      if res?
+        yield put
+          type: 'user.post.ok'
+          data: res
+
+    get: (email) ->
+      res = yield api.user.get email
+      if res?
+        yield put
+          type: 'user.get.ok'
+          data: res
+
+    put: (email, supervisor) ->
+      res = yield api.user.put email, supervisor
+      if res?
+        yield put
+          type: 'user.put.ok'
+          data: res
+
+    del: (email) ->
+      res = yield api.user.del email
+      if res?
         yield put
           type: 'user.del.ok'
-          data: res.data
+          data: res
