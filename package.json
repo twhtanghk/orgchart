@@ -23,6 +23,7 @@
     "react-dom": "^15.6.0",
     "react-redux": "^5.0.5",
     "react-redux-toastr": "^6.2.7",
+    "react-speed-dial": "^0.4.5",
     "react-tap-event-plugin": "^2.0.1",
     "redux": "^3.6.0",
     "redux-saga": "^0.15.3",
