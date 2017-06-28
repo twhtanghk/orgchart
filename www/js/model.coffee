@@ -62,7 +62,19 @@ error = (req, next) ->
 
   return res
 
-module.exports = new API "#{location.href}/api"
-  .use authMiddleware
-  .use logoutIfDeny
-  .use error
+# parse res json body and set res.data to {} if error exists
+json = (req, next) ->
+  res = yield next req
+  res.data = if res.ok then yield res.json() else {}
+
+  return res
+
+module.exports = 
+  user: 
+    new API "#{location.href}/api"
+      .use authMiddleware
+      .use logoutIfDeny
+      .use error
+  profile: 
+    new API process.env.PROFILEURL
+      .use json

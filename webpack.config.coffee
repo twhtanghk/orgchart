@@ -15,7 +15,7 @@ module.exports =
     filename: "[name].js"
   plugins: [
     new webpack.EnvironmentPlugin(
-      _.pick(process.env, 'AUTHURL', 'CLIENT_ID', 'SCOPE'), 
+      _.pick(process.env, 'PROFILEURL', 'AUTHURL', 'CLIENT_ID', 'SCOPE')
     )
   ]
   module:

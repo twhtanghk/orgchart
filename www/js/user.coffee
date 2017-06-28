@@ -106,7 +106,11 @@ class Users extends React.Component
 
   onExpand: (expandedKeys, opts) =>
     if not opts.expanded
-      @props.collapse opts.node.props.email
+      cb = (accumulator, node) ->
+        ret = [node.email].concat accumulator
+        _.reduce node.subordinates, cb, ret
+      node = opts.node.props
+      @props.collapse _.reduce(node.subordinates, cb, [node.email])
 
   expandAll: =>
     @props.expandAll()
@@ -126,7 +130,7 @@ class Users extends React.Component
 
   render: ->
     node = (user) ->
-      props = Object.assign {key: user.email, title: user.email}, user
+      props = Object.assign {key: user.email, title: user.username || user.email}, user
       E Tree.TreeNode, props, user.subordinates?.map node
     E 'div',
       E UserAdd, 
@@ -181,8 +185,7 @@ reducer = (state, action) ->
     when 'user.collapse'
       update state,
         expandedKeys:
-          $set:  _.filter state.expandedKeys, (email) ->
-            email != action.email
+          $set:  _.difference state.expandedKeys, action.emails
     when 'users.get.ok'
       update state,
         users: 
@@ -246,10 +249,10 @@ actionCreator = (dispatch) ->
     dispatch
       type: 'user.check'
       users: users
-  collapse: (email) ->
+  collapse: (emails) ->
     dispatch 
       type: 'user.collapse'
-      email: email
+      emails: emails
   addUser: (email) ->
     dispatch
       type: 'user.post'

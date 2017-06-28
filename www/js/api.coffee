@@ -10,7 +10,7 @@ orderByEmail = (users) ->
 api =
   users:
     get: ->
-      res = yield rest.get '/user'
+      res = yield rest.user.get '/user'
       if not res.error?
         # sort list by email in lowercase
         data = res.data
@@ -20,14 +20,17 @@ api =
 
     expand: (users) ->
       res = yield all users?.map (user) ->
-        data = yield api.user.get user.email
+        { data, profile } = yield all
+          data: yield api.user.get user.email
+          profile: yield api.profile.get user.email
+        Object.assign data, profile
         data.subordinates = yield api.users.expand data.subordinates
         data
       return res
 
   user:
     post: (email) ->
-      res = yield rest.post '/user', email: email
+      res = yield rest.user.post '/user', email: email
       if not res.error?
         yield put
           type: 'users.get'
@@ -35,7 +38,7 @@ api =
         return res.data
 
     get: (email) ->
-      res = yield rest.get "/user/#{email}"
+      res = yield rest.user.get "/user/#{email}"
       if not res.error?
         # sort subordinates by email in lowercase
         res.data.subordinates = orderByEmail res.data.subordinates
@@ -43,7 +46,7 @@ api =
         return res.data
 
     put: (email, supervisor) ->
-      res = yield rest.put "/user/#{email}", supervisor: supervisor
+      res = yield rest.user.put "/user/#{email}", supervisor: supervisor
       if not res.error?
         # refresh existing and new supervisor
         users = yield select (state) ->
@@ -64,7 +67,7 @@ api =
         return res.data
 
     del: (email) ->
-      res = yield rest.del "/user/#{email}"
+      res = yield rest.user.del "/user/#{email}"
       if not res.error?
         # refresh all root nodes
         yield put
@@ -72,14 +75,25 @@ api =
 
         return res.data
 
+  profile:
+    get: (email) ->
+      res = yield rest.profile.get "/user/profile/#{email}"
+
+      return res.data
+
 module.exports =
   users:
     get: ->
-      res = yield api.users.get()
-      if res?
+      users = yield api.users.get()
+      profiles = yield all users.results.map (user) ->
+        call api.profile.get, user.email
+      if users?
         yield put
           type: 'users.get.ok' 
-          data: res
+          data: 
+            count: users.count
+            results: users.results.map (user, i) ->
+              Object.assign user, profiles[i]
 
     expand: (users) ->
       res = yield api.users.expand users
@@ -97,11 +111,14 @@ module.exports =
           data: res
 
     get: (email) ->
-      res = yield api.user.get email
-      if res?
+      res = yield all [
+        call api.user.get, email
+        call api.profile.get, email
+      ]
+      if res[0]?
         yield put
           type: 'user.get.ok'
-          data: res
+          data: Object.assign res[0], res[1]
 
     put: (email, supervisor) ->
       res = yield api.user.put email, supervisor
