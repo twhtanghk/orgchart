@@ -5,7 +5,9 @@ Tree = require 'rc-tree'
 update = require 'react-addons-update'
 Promise = require 'bluebird'
 _ = require 'lodash'
+{ lightBlue300 } = require 'material-ui/styles/colors'
 Avatar = require('material-ui/Avatar').default
+Person = require('material-ui/svg-icons/social/person').default
 Close = require('material-ui/svg-icons/navigation/close').default
 Add = require('material-ui/svg-icons/content/add').default
 Delete = require('material-ui/svg-icons/action/delete').default
@@ -84,6 +86,7 @@ class Users extends React.Component
       checked: []
 
   @defaultProps:
+    showIcon: false
     showLine: true
     draggable: true
     checkable: true
@@ -130,7 +133,23 @@ class Users extends React.Component
 
   render: ->
     node = (user) ->
-      props = Object.assign {key: user.email, title: user.username || user.email}, user
+      attrs = if user.photoUrl? then src: user.photoUrl else icon: E Person
+      title = [
+        E Avatar, Object.assign(attrs,
+          key: 1
+          size: 17
+          backgroundColor: lightBlue300
+        )
+        E 'span',
+          key: 2
+          style:
+            marginLeft: 5,
+          user.username || user.email
+      ]
+      props = Object.assign 
+        key: user.email
+        title: title,
+        user
       E Tree.TreeNode, props, user.subordinates?.map node
     E 'div',
       E UserAdd, 
