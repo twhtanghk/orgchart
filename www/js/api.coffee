@@ -23,7 +23,7 @@ api =
         { data, profile } = yield all
           data: yield api.user.get user.email
           profile: yield api.profile.get user.email
-        Object.assign data, profile
+        _.defaults data, profile
         data.subordinates = yield api.users.expand data.subordinates
         data
       return res
@@ -93,7 +93,7 @@ module.exports =
           data: 
             count: users.count
             results: users.results.map (user, i) ->
-              Object.assign user, profiles[i]
+              _.defaults user, profiles[i]
 
     expand: (users) ->
       res = yield api.users.expand users
@@ -118,7 +118,7 @@ module.exports =
       if res[0]?
         yield put
           type: 'user.get.ok'
-          data: Object.assign res[0], res[1]
+          data: _.defaults res[0], res[1]
 
     put: (email, supervisor) ->
       res = yield api.user.put email, supervisor
