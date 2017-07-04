@@ -44,6 +44,7 @@ before ->
       Sails.liftAsync config
     .then (sails) ->
       global.sails = sails
+    .catch console.error
 
 after ->
   Sails

@@ -76,5 +76,5 @@ module.exports =
       .use logoutIfDeny
       .use error
   profile: 
-    new API process.env.PROFILEURL
+    new API "#{process.env.PROFILEURL}/api"
       .use json

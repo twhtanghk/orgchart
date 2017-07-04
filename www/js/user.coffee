@@ -5,7 +5,6 @@ Tree = require 'rc-tree'
 update = require 'react-addons-update'
 Promise = require 'bluebird'
 _ = require 'lodash'
-{ lightBlue300 } = require 'material-ui/styles/colors'
 Avatar = require('material-ui/Avatar').default
 Person = require('material-ui/svg-icons/social/person').default
 Close = require('material-ui/svg-icons/navigation/close').default
@@ -86,6 +85,7 @@ class Users extends React.Component
       checked: []
 
   @defaultProps:
+    size: 17
     showIcon: false
     showLine: true
     draggable: true
@@ -132,24 +132,29 @@ class Users extends React.Component
       @props.delUser user
 
   render: ->
-    node = (user) ->
-      attrs = if user.photoUrl? then src: user.photoUrl else icon: E Person
+    node = (user) =>
+      attrs = 
+        icon: E Person
+      if user.photoUrl? 
+        attrs =
+          src: "#{process.env.PROFILEURL}/#{user.photoUrl}"
+          backgroundColor: 'transparent'
+          style:
+            verticalAlign: 'middle'
       title = [
         E Avatar, Object.assign(attrs,
           key: 1
-          size: 17
-          backgroundColor: lightBlue300
+          size: @props.size
         )
         E 'span',
           key: 2
           style:
             marginLeft: 5,
-          user.username || user.email
+          user.getDisplayName()
       ]
-      props = Object.assign 
+      props = Object.assign {}, user,
         key: user.email
         title: title,
-        user
       E Tree.TreeNode, props, user.subordinates?.map node
     E 'div',
       E UserAdd, 
@@ -205,21 +210,21 @@ reducer = (state, action) ->
       update state,
         expandedKeys:
           $set:  _.difference state.expandedKeys, action.emails
-    when 'users.get.ok'
+    when 'user.getAll.ok'
       update state,
         users: 
           $set: action.data
-    when 'users.expand.ok'
+    when 'user.expand.ok'
       update state,
         expandedKeys: 
           $set: _.reduce action.data, traverse, []
         users: 
           $set: results: action.data
-    when 'users.collapseAll'
+    when 'user.collapseAll'
       update state,
         expandedKeys:
           $set: []
-    when 'user.get.ok'
+    when 'user.getOne.ok'
       update state,
         expandedKeys: 
           $set: state.expandedKeys.concat [action.data.email]
@@ -257,13 +262,13 @@ reducer = (state, action) ->
 actionCreator = (dispatch) ->
   getUsers: ->
     dispatch
-      type: 'users.get'
+      type: 'user.getAll'
   expandAll: ->
     dispatch
-      type: 'users.expandAll'
+      type: 'user.expandAll'
   collapseAll: ->
     dispatch
-      type: 'users.collapseAll'
+      type: 'user.collapseAll'
   check: (users) ->
     dispatch
       type: 'user.check'
@@ -278,7 +283,7 @@ actionCreator = (dispatch) ->
       email: email
   getUser: (email) ->
     dispatch 
-      type: 'user.get'
+      type: 'user.getOne'
       email: email
     Promise.resolve()
   putUser: (email, supervisor) ->

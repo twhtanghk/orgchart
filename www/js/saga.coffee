@@ -1,20 +1,20 @@
 { select, call, race, takeEvery } = require 'redux-saga/effects'
-api = require './api.coffee'
+{ User } = require './api.coffee'
 
 module.exports = ->
   yield race [
-    yield takeEvery 'users.get', ->
-      api.users.get()
-    yield takeEvery 'users.expandAll', ->
+    yield takeEvery 'user.getAll', ->
+      User.getAll()
+    yield takeEvery 'user.expandAll', ->
       users = yield select (state) ->
         state.data.users.results
-      yield api.users.expand users
+      yield User.expand users
     yield takeEvery 'user.post', (action) ->
-      api.user.post action.email
-    yield takeEvery 'user.get', (action) ->
-      api.user.get action.email
+      User.post action.email
+    yield takeEvery 'user.getOne', (action) ->
+      User.getOne action.email
     yield takeEvery 'user.put', (action) ->
-      api.user.put action.email, action.supervisor
+      User.put action.email, action.supervisor
     yield takeEvery 'user.del', (action) ->
-      api.user.del action.email
+      User.del action.email
   ]
