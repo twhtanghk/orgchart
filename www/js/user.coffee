@@ -141,6 +141,7 @@ class Users extends React.Component
           backgroundColor: 'transparent'
           style:
             verticalAlign: 'middle'
+            display: 'inherit'
       title = [
         E Avatar, Object.assign(attrs,
           key: 1
