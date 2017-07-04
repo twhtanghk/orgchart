@@ -1,4 +1,4 @@
-FROM node
+FROM node:6
 
 ENV VER=${VER:-master} \
     REPO=https://github.com/ewnchui/orgchart \
