@@ -1,4 +1,4 @@
-{ select, call, race, takeEvery } = require 'redux-saga/effects'
+{ select, race, takeEvery } = require 'redux-saga/effects'
 { User } = require './api.coffee'
 
 module.exports = ->

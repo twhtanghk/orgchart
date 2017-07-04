@@ -1,7 +1,7 @@
 _ = require 'lodash'
 { all, call, put, select } = require 'redux-saga/effects'
 rest = require './model.coffee'
-User = require './user.coffee'
+{ util } = require './user.coffee'
 
 orderByEmail = (users) ->
   _.sortBy users, (user) ->
@@ -39,7 +39,7 @@ class User
       yield put
         type: 'user.getAll'
 
-      User.get email
+      yield User.getOne email
 
   @expand: (users) ->
     res = yield all users?.map (user) ->
@@ -77,30 +77,30 @@ class User
       user
 
   @put: (email, supervisor) ->
-    res = yield rest.user.put "#{User.url.user}/#{email}"
+    res = yield rest.user.put "#{User.url.user}/#{email}", 
+      supervisor: supervisor
     if res.detail.ok
       # reload existing supervisor
       users = yield select (state) ->
         state.data.users
-      supervisor = User.util.find(res.data, users).supervisor
+      supervisor = util.find(res.data, users).supervisor
       supervisor = supervisor?.email || supervisor
       if supervisor?
-        User.getOne supervisor
+        yield User.getOne supervisor
       else
-        User.getAll()
+        yield User.getAll()
       # reload new supervisor
-      User.getOne user.data.supervisor.email
+      yield User.getOne res.data.supervisor.email
       # reload current updated node
-      User.getOne user.data.email
+      yield User.getOne res.data.email
       
   @del: (email) ->
     res = yield rest.user.del "#{User.url.user}/#{email}"
     if res.detail.ok
       if res.data.supervisor?
-        User.getOne res.data.supervisor
-      else
-        # reload root nodes
-        User.getAll()
+        yield User.getOne res.data.supervisor.email
+      # reload root nodes
+      yield User.getAll()
 
 module.exports =
   User: User
