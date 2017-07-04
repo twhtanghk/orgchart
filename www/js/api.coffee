@@ -7,112 +7,100 @@ orderByEmail = (users) ->
   _.sortBy users, (user) ->
     user.email.toLowerCase()
 
-api =
-  users:
-    get: ->
-      res = yield rest.get '/user'
-      if not res.error?
-        # sort list by email in lowercase
-        data = res.data
-        data.results = orderByEmail data.results
+class User
+  @url:
+      user: '/user'
+      profile: '/user/profile'
 
-        return res.data
+  constructor: (props) ->
+    _.extend @, props
+    @subordinates = orderByEmail @subordinates
+    @subordinates = @subordinates.map (user) ->
+      new User user
 
-    expand: (users) ->
-      res = yield all users?.map (user) ->
-        data = yield api.user.get user.email
-        data.subordinates = yield api.users.expand data.subordinates
-        data
-      return res
+  addProps: (props) ->
+    _.extend @, props
 
-  user:
-    post: (email) ->
-      res = yield rest.post '/user', email: email
-      if not res.error?
-        yield put
-          type: 'users.get'
+  getFullName: ->
+    """
+      #{@name?.given || ''} #{@name?.middle || ''} #{@name?.family || ''}
+    """.trim() || @username || @email
 
-        return res.data
+  getTitle: ->
+    "#{@organization?.name || ''} #{@title || ''}".trim()
 
-    get: (email) ->
-      res = yield rest.get "/user/#{email}"
-      if not res.error?
-        # sort subordinates by email in lowercase
-        res.data.subordinates = orderByEmail res.data.subordinates
+  getDisplayName: ->
+    "#{@getFullName()} #{@getTitle()}".trim()
 
-        return res.data
+  @post: (email) ->
+    res = yield rest.user.post User.url.user, email: email
+    if not res.error?
+      # reload root nodes
+      yield put
+        type: 'user.getAll'
 
-    put: (email, supervisor) ->
-      res = yield rest.put "/user/#{email}", supervisor: supervisor
-      if not res.error?
-        # refresh existing and new supervisor
-        users = yield select (state) ->
-          state.data.users
-        supervisor = User.util.find(res.data, users).supervisor
-        supervisor = supervisor?.email || supervisor
-        if supervisor?
-          yield put
-            type: 'user.get'
-            email: supervisor
-        else
-          yield put
-            type: 'users.get'
-        yield put
-          type: 'user.get'
-          email: res.data.supervisor.email
+      User.get email
 
-        return res.data
+  @expand: (users) ->
+    res = yield all users?.map (user) ->
+      user = yield User.getOne user.email
+      yield User.expand user.subordinates
 
-    del: (email) ->
-      res = yield rest.del "/user/#{email}"
-      if not res.error?
-        # refresh all root nodes
-        yield put
-          type: 'users.get'
+  @getAll: ->
+    users = yield rest.user.get User.url.user
+    if users.detail.ok
+      users = users.data
+      users.results = orderByEmail users.results
+      users.results = users.results.map (user) ->
+        new User user
+      profiles = yield all users.results.map (user) ->
+        res = yield rest.profile.get "#{User.url.profile}/#{user.email}"
+        res
+      yield put
+        type: 'user.getAll.ok'
+        data:
+          count: users.count
+          results: users.results.map (user, i) ->
+            user.addProps profiles[i].data
 
-        return res.data
+  @getOne: (email) ->
+    [user, profile] = yield all [
+      rest.user.get "#{User.url.user}/#{email}"
+      rest.profile.get "#{User.url.profile}/#{email}"
+    ]
+    if user.detail.ok
+      user = new User user.data
+      user.addProps profile.data
+      yield put
+        type: 'user.getOne.ok'
+        data: user
+      user
+
+  @put: (email, supervisor) ->
+    res = yield rest.user.put "#{User.url.user}/#{email}"
+    if res.detail.ok
+      # reload existing supervisor
+      users = yield select (state) ->
+        state.data.users
+      supervisor = User.util.find(res.data, users).supervisor
+      supervisor = supervisor?.email || supervisor
+      if supervisor?
+        User.getOne supervisor
+      else
+        User.getAll()
+      # reload new supervisor
+      User.getOne user.data.supervisor.email
+      # reload current updated node
+      User.getOne user.data.email
+      
+  @del: (email) ->
+    res = yield rest.user.del "#{User.url.user}/#{email}"
+    if res.detail.ok
+      if res.data.supervisor?
+        User.getOne res.data.supervisor
+      else
+        # reload root nodes
+        User.getAll()
 
 module.exports =
-  users:
-    get: ->
-      res = yield api.users.get()
-      if res?
-        yield put
-          type: 'users.get.ok' 
-          data: res
-
-    expand: (users) ->
-      res = yield api.users.expand users
-      if res?
-        yield put
-          type: 'users.expand.ok'
-          data: res
-
-  user:
-    post: (email) ->
-      res = yield api.user.post email
-      if res?
-        yield put
-          type: 'user.post.ok'
-          data: res
-
-    get: (email) ->
-      res = yield api.user.get email
-      if res?
-        yield put
-          type: 'user.get.ok'
-          data: res
-
-    put: (email, supervisor) ->
-      res = yield api.user.put email, supervisor
-      if res?
-        yield put
-          type: 'user.put.ok'
-          data: res
-
-    del: (email) ->
-      res = yield api.user.del email
-      if res?
-        yield put
-          type: 'user.del.ok'
-          data: res
+  User: User
