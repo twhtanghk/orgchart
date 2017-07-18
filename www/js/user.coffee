@@ -1,6 +1,5 @@
 React = require 'react'
 E = require 'react-script'
-rest = require './model.coffee'
 Tree = require 'rc-tree'
 update = require 'react-addons-update'
 Promise = require 'bluebird'
@@ -39,7 +38,7 @@ del = (user, users) ->
 merge = (user, users) ->
   cb = (node) ->
     if node.email == user.email
-      update node, $merge: user
+      update node, $set: user
     else
       node.subordinates = _.map node.subordinates, cb
       node
@@ -94,12 +93,12 @@ class Users extends React.Component
     loadData: (node) ->
       @getUser node.props.email
     onDrop: (opts) ->
-      oldSup = opts.dragNode.props.supervisor
-      oldSup = oldSup?.email || oldSup
+      user = opts.dragNode.props.email
+      oldSup = user.supervisor
       newSup = opts.node.props.email
       if oldSup == newSup
         return
-      @putUser opts.dragNode.props.email, opts.node.props.email
+      @putUser user, newSup
 
   componentDidMount: ->
     @props.getUsers()
@@ -189,14 +188,13 @@ class Users extends React.Component
             rightAvatar: E Avatar, icon: E Collapse
             onTouchTap: @collapseAll
 
+{ User } = require './api.coffee'
 initState =
   checkedKeys:
     checked: []
   expandedKeys: []
-  users: 
-    count: 0
-    result: []
-  user: {}
+  users: User.users
+  user: User.user
 
 reducer = (state, action) ->
   traverse = (accumulator, user) ->
@@ -228,19 +226,23 @@ reducer = (state, action) ->
     when 'user.getOne.ok'
       update state,
         expandedKeys: 
-          $set: state.expandedKeys.concat [action.data.email]
+          $set: state.expandedKeys.concat [User.user.email]
         user: 
-          $set: action.data
-        users: 
-          $set: merge action.data, state.users
+          $set: User.user
+    when 'user.post.ok'
+      update state,
+        user:
+          $set: User.user
+        users:
+          $set: User.users
     when 'user.put.ok'
       update state,
         expandedKeys: 
-          $set: _.uniq state.expandedKeys.concat [action.data.email]
+          $set: _.uniq state.expandedKeys.concat [User.user.email]
         user: 
-          $set: action.data
+          $set: User.user
         users: 
-          $set: merge action.data, state.users
+          $set: User.users
     when 'user.del.ok'
       update state,
         checkedKeys: 
