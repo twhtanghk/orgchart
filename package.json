@@ -29,6 +29,7 @@
     "redux-saga": "^0.15.3",
     "redux-saga-rest": "^0.2.2",
     "request": "^2.67.0",
+    "saga-model": "0.0.1",
     "sails": "~0.12",
     "sails-disk": "~0.10.0",
     "sails-hook-mongo-auto-index": "^0.1.3",
