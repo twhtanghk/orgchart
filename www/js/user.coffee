@@ -16,36 +16,6 @@ TextField = require('material-ui/TextField').default
 Dialog = require('material-ui/Dialog').default
 { SpeedDial, BubbleList, BubbleListItem } = require 'react-speed-dial'
 
-find = (user, users) ->
-  cb = (initVal, node) ->
-    if initVal?
-      initVal
-    else if node.email == user.email
-      node
-    else
-      _.reduce node.subordinates, cb, initVal
-  _.reduce users.results, cb, null
-
-del = (user, users) ->
-  cb = (nodes) ->
-    ret = _.filter nodes, (node) ->
-      node.email != user.email
-    ret.map (node) ->
-      node.subordinates = cb node.subordinates
-    ret
-  cb users
-
-merge = (user, users) ->
-  cb = (node) ->
-    if node.email == user.email
-      update node, $set: user
-    else
-      node.subordinates = _.map node.subordinates, cb
-      node
-  update users, 
-    results: 
-      $merge: _.map users.results, cb
-           
 class UserAdd extends React.Component
   state:
     email: ''
@@ -167,7 +137,7 @@ class Users extends React.Component
         onExpand: @onExpand,
         onCheck: @onCheck, 
         @props),
-        @props.users.results?.map node
+        @props.users.map node
       E SpeedDial,
         hasBackdrop: false,
         E BubbleList,
@@ -188,7 +158,7 @@ class Users extends React.Component
             rightAvatar: E Avatar, icon: E Collapse
             onTouchTap: @collapseAll
 
-{ User } = require './api.coffee'
+{ User } = require './model.coffee'
 initState =
   checkedKeys:
     checked: []
@@ -209,63 +179,74 @@ reducer = (state, action) ->
       update state,
         expandedKeys:
           $set:  _.difference state.expandedKeys, action.emails
-    when 'user.getAll.ok'
+    when 'user.list.ok'
+      { users, user } = action.data
       update state,
-        users: 
-          $set: action.data
-    when 'user.expand.ok'
-      update state,
-        expandedKeys: 
-          $set: _.reduce action.data, traverse, []
-        users: 
-          $set: results: action.data
+        user: 
+          $set: user
+        users:
+          $set: users
     when 'user.collapseAll'
       update state,
         expandedKeys:
           $set: []
-    when 'user.getOne.ok'
+    when 'user.expand.ok'
+      { users, user } = action.data
       update state,
         expandedKeys: 
-          $set: state.expandedKeys.concat [User.user.email]
-        user: 
-          $set: User.user
-    when 'user.post.ok'
+          $set: state.expandedKeys.concat [user.email]
+        user:
+          $set: user
+        users:
+          $set: users
+    when 'user.create.ok'
+      { users, user } = action.data
       update state,
         user:
-          $set: User.user
+          $set: user
         users:
-          $set: User.users
-    when 'user.put.ok'
+          $set: users
+    when 'user.update.ok'
+      { users, user } = action.data
       update state,
         expandedKeys: 
-          $set: _.uniq state.expandedKeys.concat [User.user.email]
+          $set: _.uniq state.expandedKeys.concat [user.email]
         user: 
-          $set: User.user
+          $set: user
         users: 
-          $set: User.users
-    when 'user.del.ok'
+          $set: users
+    when 'user.delete.ok'
+      { users, user } = action.data
       update state,
         checkedKeys: 
           checked:
             $set: _.filter state.checkedKeys.checked, (email) ->
-              email != action.data.email
+              email != user.email
         expandedKeys: 
           $set: _.filter state.expandedKeys, (email) ->
-            email != action.data.email
+            email != user.email
         user: 
-          $set: action.data
+          $set: user
         users:
-          count: 
-            $set: state.users.count - 1
-          results: 
-            $set: del state.users.results
+          $set: users
+    when 'user.expandAll.ok'
+      { users, user } = action.data
+      update state,
+        expandedKeys:
+          $apply: ->
+            for user from User.bfs users
+              user.email
+        users:
+          $set: users
+        user:
+          $set: user
     else
       state || initState
 
 actionCreator = (dispatch) ->
   getUsers: ->
     dispatch
-      type: 'user.getAll'
+      type: 'user.list'
   expandAll: ->
     dispatch
       type: 'user.expandAll'
@@ -282,21 +263,21 @@ actionCreator = (dispatch) ->
       emails: emails
   addUser: (email) ->
     dispatch
-      type: 'user.post'
+      type: 'user.create'
       email: email
   getUser: (email) ->
     dispatch 
-      type: 'user.getOne'
+      type: 'user.expand'
       email: email
     Promise.resolve()
   putUser: (email, supervisor) ->
     dispatch
-      type: 'user.put'
+      type: 'user.update'
       email: email
       supervisor: supervisor
   delUser: (email) ->
     dispatch 
-      type: 'user.del'
+      type: 'user.delete'
       email: email
       
 module.exports =
@@ -304,6 +285,3 @@ module.exports =
   state: initState
   reducer: reducer
   actionCreator: actionCreator
-  util:
-    find: find
-    merge: merge
