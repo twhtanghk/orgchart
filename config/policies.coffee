@@ -5,5 +5,6 @@ module.exports =
       create: ['isAuth', 'isAdmin']
       find: ['supervisor']
       findOne: ['me']
-      update: ['isAuth', 'me', 'canUpdate']
       destroy: ['isAuth', 'me', 'canUpdate']
+      add: ['isAuth', 'me', 'canUpdate']
+      remove: ['isAuth', 'me', 'canUpdate']
