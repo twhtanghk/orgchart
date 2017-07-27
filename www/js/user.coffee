@@ -1,6 +1,6 @@
 React = require 'react'
 E = require 'react-script'
-Tree = require 'rc-tree'
+Tree = require('rc-tree').default
 update = require 'react-addons-update'
 Promise = require 'bluebird'
 _ = require 'lodash'
