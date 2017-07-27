@@ -2,7 +2,6 @@ _ = require 'lodash'
 { all, call, put, select } = require 'redux-saga/effects'
 stampCreator = require 'saga-model'
 { util } = require './user.coffee'
-{ toastr } = require 'react-redux-toastr'
 stampit = require 'stampit'
 
 ProfileStamp = stampCreator "#{process.env.PROFILEURL}/api/user/profile"
@@ -19,12 +18,18 @@ User = UserStamp
     parse: (data) ->
       if data.supervisor?
         data.supervisor = User if typeof data.supervisor == 'string' then email: data.supervisor else data.supervisor
-      data.subordinates = User.order(data.subordinates).map (user) ->
+      data.subordinates = User.order data.subordinates?.map (user) ->
         User user
       data
       
     fetch: ->
       { data } = yield UserStamp.compose.methods.fetch.call @
+      data.subordinates = data.subordinates?.map (user) ->
+        User user
+      res = yield ProfileStamp.fetchAll email: data.subordinates.map (user) ->
+        user.email
+      profiles = res.data
+      data.subordinates = User.mergeAll data.subordinates, profiles
       User data
 
     save: (values) ->
@@ -82,9 +87,9 @@ User = UserStamp
         if user.subordinates?.length
           yield from @bfs user.subordinates
 
-    order: (users, field = 'email') ->
+    order: (users) ->
       _.sortBy users, (user) ->
-        user[field].toLowerCase()
+        user.getDisplayName().toLowerCase()
 
     find: (users, user) ->
       for value from @bfs users
@@ -108,8 +113,12 @@ User = UserStamp
 
     fetchAll: (data) ->
       res = yield UserStamp.fetchAll data
-      @order res.data.map (user) ->
+      users = @order res.data.map (user) ->
         User user
+      res = yield ProfileStamp.fetchAll email: users.map (user) ->
+        user.email
+      profiles = res.data
+      @mergeAll users, profiles
 
     fetchNode: (node = null) ->
       users = yield @fetchAll node
