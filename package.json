@@ -32,7 +32,7 @@
     "saga-model": "0.0.1",
     "sails": "~0.12",
     "sails-disk": "~0.10.0",
-    "sails-hook-mongo-auto-index": "^0.1.3",
+    "sails-hook-mongo-auto-index": "https://github.com/twhtanghk/sails-hook-mongo-auto-index",
     "sails-hook-requestlogger-file": "^2.0.5",
     "sails-mongo": "^0.12.2",
     "stampit": "^3.1.3",
