@@ -2,6 +2,25 @@ _ = require 'lodash'
 path = require 'path'
 webpack = require 'webpack'
 
+babelLoader =
+  loader: 'babel-loader'
+  query:
+    plugins: [ 
+      [
+        'transform-runtime'
+        {
+          helpers: false
+          polyfill: true
+          regenerator: true
+          moduleName: 'babel-runtime'
+        }
+      ]
+    ]
+    presets: [
+      'es2015'
+      'stage-2'
+    ]
+
 module.exports =
   entry:
     index: [
@@ -28,28 +47,16 @@ module.exports =
         ] 
       }
       { 
+        test: /saga\-model/
+        use: [
+          babelLoader
+        ]
+      }
+      { 
         test: /\.coffee$/
         exclude: /node_modules/
         use: [
-          {
-            loader: 'babel-loader'
-            query:
-              plugins: [ 
-                [
-                  'transform-runtime'
-                  {
-                    helpers: false
-                    polyfill: true
-                    regenerator: true
-                    moduleName: 'babel-runtime'
-                  }
-                ]
-              ]
-              presets: [
-                'es2015'
-                'stage-2'
-              ]
-          }
+          babelLoader
           {
             loader: 'coffee-loader'
             options:
