@@ -12,6 +12,7 @@
     "coffee-script": "^1.10.0",
     "lodash": "^4.17.4",
     "material-ui": "^0.18.3",
+    "nocache": "^2.0.0",
     "oauth2_client": "0.0.2",
     "passport": "^0.3.2",
     "passport-http-bearer": "^1.0.1",
