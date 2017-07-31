@@ -1,9 +1,10 @@
+_ = require 'lodash'
+require 'rc-tree/assets/index.css'
 React = require 'react'
 E = require 'react-script'
 Tree = require('rc-tree').default
 update = require 'react-addons-update'
 Promise = require 'bluebird'
-_ = require 'lodash'
 Avatar = require('material-ui/Avatar').default
 Person = require('material-ui/svg-icons/social/person').default
 Close = require('material-ui/svg-icons/navigation/close').default
@@ -46,6 +47,28 @@ class UserAdd extends React.Component
         hintText: 'user@abc.com'
         onChange: (event, newValue) =>
           @setState email: newValue
+
+class Actions extends React.Component
+  render: ->
+    E SpeedDial,
+      hasBackdrop: false,
+      E BubbleList,
+        E BubbleListItem,
+          primaryText: 'Add'
+          rightAvatar: E Avatar, icon: E Add
+          onTouchTap: @props.openAdd
+        E BubbleListItem,
+          primaryText: 'Delete'
+          rightAvatar: E Avatar, icon: E Delete
+          onTouchTap: @props.del
+        E BubbleListItem,
+          primaryText: 'Expand All'
+          rightAvatar: E Avatar, icon: E Expand
+          onTouchTap: @props.expandAll
+        E BubbleListItem,
+          primaryText: 'Collapse All'
+          rightAvatar: E Avatar, icon: E Collapse
+          onTouchTap: @props.collapseAll
 
 class Users extends React.Component
   state:
@@ -100,33 +123,40 @@ class Users extends React.Component
     @props.checkedKeys.checked.map (user) =>
       @props.delUser user
 
+  node: (user) ->
+    attrs = 
+      icon: E Person
+    if user.photoUrl? 
+      attrs =
+        src: "#{process.env.PROFILEURL}/#{user.photoUrl}"
+        backgroundColor: 'transparent'
+        style:
+          verticalAlign: 'middle'
+          display: 'inherit'
+    title = [
+      E Avatar, Object.assign(attrs,
+        key: 1
+        size: @props.size
+      )
+      E 'span',
+        key: 2
+        style:
+          marginLeft: 5,
+        user.getDisplayName()
+    ]
+    props = Object.assign {}, user,
+      key: user.email
+      title: title,
+    E Tree.TreeNode, props, user.subordinates?.map (user) =>
+      @node user
+
   render: ->
-    node = (user) =>
-      attrs = 
-        icon: E Person
-      if user.photoUrl? 
-        attrs =
-          src: "#{process.env.PROFILEURL}/#{user.photoUrl}"
-          backgroundColor: 'transparent'
-          style:
-            verticalAlign: 'middle'
-            display: 'inherit'
-      title = [
-        E Avatar, Object.assign(attrs,
-          key: 1
-          size: @props.size
-        )
-        E 'span',
-          key: 2
-          style:
-            marginLeft: 5,
-          user.getDisplayName()
-      ]
-      props = Object.assign {}, user,
-        key: user.email
-        title: title,
-      E Tree.TreeNode, props, user.subordinates?.map node
     E 'div',
+      E Actions,
+        openAdd: @openAdd
+        del: @del
+        expandAll: @expandAll
+        collapseAll: @collapseAll
       E UserAdd, 
         addUser: @props.addUser
         open: @state.open
@@ -137,26 +167,8 @@ class Users extends React.Component
         onExpand: @onExpand,
         onCheck: @onCheck, 
         @props),
-        @props.users.map node
-      E SpeedDial,
-        hasBackdrop: false,
-        E BubbleList,
-          E BubbleListItem,
-            primaryText: 'Add'
-            rightAvatar: E Avatar, icon: E Add
-            onTouchTap: @openAdd
-          E BubbleListItem,
-            primaryText: 'Delete'
-            rightAvatar: E Avatar, icon: E Delete
-            onTouchTap: @del
-          E BubbleListItem,
-            primaryText: 'Expand All'
-            rightAvatar: E Avatar, icon: E Expand
-            onTouchTap: @expandAll
-          E BubbleListItem,
-            primaryText: 'Collapse All'
-            rightAvatar: E Avatar, icon: E Collapse
-            onTouchTap: @collapseAll
+        @props.users.map (user) =>
+          @node user
 
 { User } = require './model.coffee'
 initState =

@@ -1,4 +1,3 @@
-require 'rc-tree/assets/index.css'
 require 'react-redux-toastr/lib/css/react-redux-toastr.min.css'
 _ = require 'lodash'
 {compose, createStore, combineReducers, applyMiddleware} = require 'redux'
