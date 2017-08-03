@@ -1,5 +1,7 @@
-_ = require 'lodash'
+require '../css/index.scss'
 require 'rc-tree/assets/index.css'
+require 'react-contextmenu/public/styles.5bb557.css'
+_ = require 'lodash'
 React = require 'react'
 E = require 'react-script'
 Tree = require('rc-tree').default
@@ -16,6 +18,7 @@ FlatButton = require('material-ui/FlatButton').default
 TextField = require('material-ui/TextField').default
 Dialog = require('material-ui/Dialog').default
 { SpeedDial, BubbleList, BubbleListItem } = require 'react-speed-dial'
+{ ContextMenu, MenuItem, ContextMenuTrigger } = require 'react-contextmenu'
 
 class UserAdd extends React.Component
   state:
@@ -70,6 +73,20 @@ class Actions extends React.Component
           rightAvatar: E Avatar, icon: E Collapse
           onTouchTap: @props.collapseAll
 
+class Menu extends React.Component
+  state: {}
+  
+  render: =>
+    cut = (event, data, elem) =>
+      @state.data = data
+    paste = (event, data, elem) =>
+      user = @state.data.email
+      supervisor = data.email
+      @props.putUser user, supervisor
+    E ContextMenu, id: 'menu',
+      E MenuItem, onClick: cut, 'Cut'
+      E MenuItem, onClick: paste, 'Paste'
+
 class Users extends React.Component
   state:
     open: false
@@ -80,18 +97,10 @@ class Users extends React.Component
     size: 17
     showIcon: false
     showLine: true
-    draggable: true
     checkable: true
     checkStrictly: true
     loadData: (node) ->
       @getUser node.props.email
-    onDrop: (opts) ->
-      user = opts.dragNode.props.email
-      oldSup = user.supervisor
-      newSup = opts.node.props.email
-      if oldSup == newSup
-        return
-      @putUser user, newSup
 
   componentDidMount: ->
     @props.getUsers()
@@ -133,25 +142,31 @@ class Users extends React.Component
         style:
           verticalAlign: 'middle'
           display: 'inherit'
-    title = [
-      E Avatar, Object.assign(attrs,
-        key: 1
-        size: @props.size
-      )
-      E 'span',
-        key: 2
-        style:
-          marginLeft: 5,
-        user.getDisplayName()
-    ]
+    title = (
+      E ContextMenuTrigger,
+        collect: -> 
+          user
+        id: 'menu'
+        key: user.email,
+        E Avatar, Object.assign(attrs,
+          key: 1
+          size: @props.size
+        )
+        E 'span',
+          key: 2
+          style:
+            marginLeft: 5,
+          user.getDisplayName()
+    )
     props = Object.assign {}, user,
       key: user.email
-      title: title,
+      title: title
     E Tree.TreeNode, props, user.subordinates?.map (user) =>
       @node user
 
   render: ->
     E 'div',
+      E Menu, putUser: @props.putUser
       E Actions,
         openAdd: @openAdd
         del: @del
