@@ -113,12 +113,12 @@ User = UserStamp
 
     fetchAll: (data) ->
       res = yield UserStamp.fetchAll data
-      users = @order res.data.map (user) ->
+      users = res.data.map (user) ->
         User user
       res = yield ProfileStamp.fetchAll email: users.map (user) ->
         user.email
       profiles = res.data
-      @mergeAll users, profiles
+      @order @mergeAll(users, profiles)
 
     fetchNode: (node = null) ->
       users = yield @fetchAll node
