@@ -43,7 +43,7 @@ class Email extends stream.Transform
       'Business Phone'
       'Internet Address'
     ]
-    [ input, title, org ] = /([ a-zA-Z0-9]*)(\(*.*)/.exec chunk['Job Title'].trim().replace('Ag.', '')
+    [ input, title, org ] = /([ a-zA-Z0-9]*)(\(*.*)/.exec chunk['Job Title'].trim().replace('Ag.', '').replace('On leave', '')
     data =
       name:
         given: chunk['First Name']
