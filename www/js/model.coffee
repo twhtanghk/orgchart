@@ -48,7 +48,7 @@ User = UserStamp
       "#{@organization?.name || ''} #{@title || ''}".trim()
 
     getDisplayName: ->
-      "#{@getFullName()} #{@getTitle()}".trim()
+      "#{@getTitle()} #{@getFullName()}".trim()
 
     getTotal: ->
       ret = 1

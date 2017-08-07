@@ -12,6 +12,7 @@ fs = require 'fs'
 stream = require 'stream'
 Parser = require('csv').parse
 oauth2 = require 'oauth2_client'
+{ parseOneAddress } = require 'email-addresses'
 
 token = ->
   users =
@@ -30,7 +31,7 @@ token = ->
 class Email extends stream.Transform
   @url:
     user: 'localhost:1337/api/user'
-    profile: process.env.PROFILEURL
+    profile: "#{process.env.PROFILEURL}/api/user"
 
   _transform: (chunk, encoding, cb) ->
     fields = [
@@ -38,29 +39,40 @@ class Email extends stream.Transform
       'Middle Name'
       'Last Name'
       'Department'
-      'Job Titile'
+      'Job Title'
       'Business Phone'
       'Internet Address'
     ]
+    [ input, title, org ] = /([ a-zA-Z0-9]*)(\(*.*)/.exec chunk['Job Title'].trim().replace('Ag.', '')
     data =
       name:
         given: chunk['First Name']
         family: chunk['Last Name']
       organization:
-        name: chunk['Department']
-      title: chunk['Job Title']
+        name: org
+      title: title
       email: chunk['Internet Address']
-      phone:
-        Office: chunk['Business Phone']
-    @user data
+      phone: [
+        { type: 'Office', value: chunk['Business Phone'] }
+      ]
+    Promise
+      .try ->
+        if data.email == ''
+          throw new Error 'email not yet defined'
+        _.extend data, 
+          username: parseOneAddress(data.email).local
+      .then (data) =>
+        Promise
+          .all [
+            @user data
+            @profile data
+          ]
       .catch (err) ->
         console.error "#{err}: #{JSON.stringify data}"
       .then ->
         cb()
 
   user: (data) ->
-    if data?.email == ''
-      return Promise.reject 'email not yet defined'
     token()
       .then (token) ->
         req
@@ -71,7 +83,20 @@ class Email extends stream.Transform
             if res.statusCode == 201
               Promise.resolve()
             else 
-              Promise.reject res.body.details
+              Promise.reject("user: #{res.body.details || res.statusMessage}")
+
+  profile: (data) ->
+    token()
+      .then (token) ->
+        req
+          .postAsync Email.url.profile, data,
+            headers:
+              Authorization: "Bearer #{token}"
+          .then (res) ->
+            if res.statusCode == 201
+              Promise.resolve()
+            else
+              Promise.reject("profile: #{res.body.details || res.statusMessage}")
 
 resolve = ->
 reject = console.error
