@@ -1,6 +1,6 @@
 require '../css/index.scss'
 require 'rc-tree/assets/index.css'
-require 'react-contextmenu/public/styles.5bb557.css'
+require 'react-contextmenu/public/styles.css'
 _ = require 'lodash'
 React = require 'react'
 E = require 'react-script'
@@ -37,13 +37,13 @@ class UserAdd extends React.Component
           E FlatButton,
             label: 'Cancel'
             default: true
-            onTouchTap: @props.close
+            onClick: @props.close
         )
         (
           E FlatButton,
             label: 'Create'
             primary: true
-            onTouchTap: @add
+            onClick: @add
         )
       ],
       E TextField,
@@ -59,19 +59,19 @@ class Actions extends React.Component
         E BubbleListItem,
           primaryText: 'Add'
           rightAvatar: E Avatar, icon: E Add
-          onTouchTap: @props.openAdd
+          onClick: @props.openAdd
         E BubbleListItem,
           primaryText: 'Delete'
           rightAvatar: E Avatar, icon: E Delete
-          onTouchTap: @props.del
+          onClick: @props.del
         E BubbleListItem,
           primaryText: 'Expand All'
           rightAvatar: E Avatar, icon: E Expand
-          onTouchTap: @props.expandAll
+          onClick: @props.expandAll
         E BubbleListItem,
           primaryText: 'Collapse All'
           rightAvatar: E Avatar, icon: E Collapse
-          onTouchTap: @props.collapseAll
+          onClick: @props.collapseAll
 
 class Menu extends React.Component
   state: {}
@@ -189,6 +189,7 @@ class Users extends React.Component
 initState =
   checkedKeys:
     checked: []
+    halfChecked: []
   expandedKeys: []
   users: User.users
   user: User.user
@@ -201,7 +202,7 @@ reducer = (state, action) ->
       update state,
         checkedKeys: 
           checked: 
-            $set: action.users
+            $set: action.users.checked
     when 'user.collapse'
       update state,
         expandedKeys:
