@@ -1,13 +1,11 @@
-FROM node:6
+FROM node
 
-ENV VER=${VER:-master} \
-    REPO=https://github.com/ewnchui/orgchart \
-    APP=/usr/src/app
+ENV APP=/usr/src/app
+ADD . $APP
 
 WORKDIR $APP
 
-RUN git clone -b $VER $REPO $APP \
-&&  npm install
+RUN yarn install
 
 EXPOSE 1337
 
