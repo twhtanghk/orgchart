@@ -3,7 +3,7 @@ module.exports =
     UserController:
       '*': false
       create: ['isAuth', 'isAdmin']
-      find: ['supervisor']
+      find: true
       findOne: ['me']
       destroy: ['isAuth', 'me', 'canUpdate']
       update: ['isAuth', 'me', 'canUpdate']

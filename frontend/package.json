@@ -12,10 +12,12 @@
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.0-beta.6",
-    "@vue/cli-plugin-eslint": "^3.0.0-beta.6",
     "@vue/cli-service": "^3.0.0-beta.6",
+    "bootstrap-vue": "^2.0.0-rc.6",
     "coffee-loader": "^0.9.0",
     "coffeescript": "^2.2.4",
+    "vue-async-computed": "^3.3.1",
+    "vue-jstree": "^1.0.11",
     "vue-template-compiler": "^2.5.13",
     "vue.model": "https://github.com/twhtanghk/vue.model",
     "vue.oauth2": "https://github.com/twhtanghk/vue.oauth2"
@@ -23,13 +25,6 @@
   "babel": {
     "presets": [
       "@vue/app"
-    ]
-  },
-  "eslintConfig": {
-    "root": true,
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
     ]
   },
   "postcss": {
