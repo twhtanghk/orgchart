@@ -43,7 +43,7 @@
   "scripts": {
     "build": "webpack",
     "debug": "node debug app.js",
-    "start": "node app.js",
+    "start": "node app.js --prod",
     "test": "mocha test/bootstrap.test.coffee test/unit/**/*.coffee"
   },
   "main": "app.js",
