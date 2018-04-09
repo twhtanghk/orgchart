@@ -1,6 +1,6 @@
 ###
 read lotus notes exported csv file 
-and feed the data into orgchart and user profile
+and feed the data into orgchart
 
 usage:
   node_modules/.bin/coffee script/user.coffee < test/data/email.csv
@@ -31,7 +31,6 @@ token = ->
 class Email extends stream.Transform
   @url:
     user: 'localhost:1337/api/user'
-    profile: "#{process.env.PROFILEURL}/api/user"
 
   _transform: (chunk, encoding, cb) ->
     fields = [
@@ -48,8 +47,7 @@ class Email extends stream.Transform
       name:
         given: chunk['First Name']
         family: chunk['Last Name']
-      organization:
-        name: org
+      organization: org
       title: title
       email: chunk['Internet Address']
       phone: [
@@ -62,11 +60,7 @@ class Email extends stream.Transform
         _.extend data, 
           username: parseOneAddress(data.email).local
       .then (data) =>
-        Promise
-          .all [
-            @user data
-            @profile data
-          ]
+        @user data
       .catch (err) ->
         console.error "#{err}: #{JSON.stringify data}"
       .then ->
@@ -84,19 +78,6 @@ class Email extends stream.Transform
               Promise.resolve()
             else 
               Promise.reject("user: #{res.body.details || res.statusMessage}")
-
-  profile: (data) ->
-    token()
-      .then (token) ->
-        req
-          .postAsync Email.url.profile, data,
-            headers:
-              Authorization: "Bearer #{token}"
-          .then (res) ->
-            if res.statusCode == 201
-              Promise.resolve()
-            else
-              Promise.reject("profile: #{res.body.details || res.statusMessage}")
 
 resolve = ->
 reject = console.error

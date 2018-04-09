@@ -2,11 +2,11 @@ _ = require 'lodash'
 Promise = require 'bluebird'
 
 module.exports =
-  
-  tableName:  'user'
 
   autoPK: false
   
+  tableName:  'user'
+
   schema: true
   
   attributes:
@@ -16,6 +16,18 @@ module.exports =
       unique: true
       required: true
       primaryKey: true
+
+    name:
+      type: 'json'
+
+    organization:
+      type: 'string'
+
+    title:
+      type: 'string'
+
+    phone:
+      type: 'array'
 
     supervisor:
       model: 'user'
