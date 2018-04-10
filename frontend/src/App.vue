@@ -5,23 +5,60 @@
     <tree 
       :data='users'
       :showCheckbox='true'
-      :text-field-name='"email"'
+      :text-field-name='"display"'
       :value-field-name='"email"'
       :draggable='true'
-      :on-item-drop='drop'
+      :async='load'
     />
   </div>
 </template>
 
 <script lang='coffee'>
+_ = require 'lodash'
 Vue = require('vue').default
 Vue.use require('vue.oauth2/src/plugin').default
-Vue.use require('vue.model/src/plugin').default
-Vue.use require('vue-async-computed')
+tree = require('vue-jstree').default
 
 module.exports =
   components:
-    tree: require('vue-jstree').default
+    tree:
+      extends: tree
+      methods:
+        onItemDrop: (e, oriNode, oriItem) ->
+          supervisor = oriNode.model.email
+          subordinate = @draggedItem.item.email
+          if supervisor == subordinate
+            return
+          @$parent.$refs.user
+            .update subordinate,
+              data:
+                supervisor: supervisor
+            .then =>
+              {parentItem, index} = @draggedItem
+              parentItem.splice index, 1
+    model:
+      extends: require('vue.model/src/model').default
+      methods:
+        ou: (data) ->
+          if data.organization? or data.title?
+            "#{data.organization || ''}/#{data.title || ''}"
+          else
+            ''
+        fullname: (data) ->
+          {given, family} = data.name
+          if given? or family?
+            "#{given || ''} #{family || ''}"
+          else
+            ''
+        display: (data) ->
+          "#{@ou data} #{@fullname data} #{data.email}"
+        format: (data) ->
+          data.subordinates = data.subordinates?.map @format
+          _.extend data,
+            icon: 'fa fa-user icon-state-default'
+            display: "#{@display data}"
+            children: data.subordinates
+            parent: data.supervisor
   data: ->
     searchword: ''
     users: []
@@ -32,25 +69,26 @@ module.exports =
       scope: 'User'
       response_type: 'token'
   methods:
-    drop: ->
-      console.log arguments
-  mounted: ->
-    do =>
+    load: (oriNode, cb) ->
+      ret = []
       gen = @$refs.user?.listAll
         data:
-          supervisor: null
+          supervisor: if oriNode.model? then oriNode.model.email else null
+          populate: 'subordinates'
           sort:
-            email: 1
+            organization: 1
       if gen?
         {next} = gen()
         while true
-          {done, value} = await next @users.length
+          {done, value} = await next ret.length
           break if done
-          for i in value
-            @users.push i
+          ret = ret.concat value
+      cb ret
 </script>
 
 <style>
+@import 'https://use.fontawesome.com/releases/v5.0.9/css/all.css';
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
