@@ -19,12 +19,24 @@
       multiple
       :data='users'
       :showCheckbox='true'
-      text-field-name='display'
       value-field-name='email'
       children-field-name='subordinates'
       :draggable='true'
       @item-toggle='toggleUser'
-      @item-drop='updateSupervisor' />
+      @item-drop='updateSupervisor'>
+      <template slot-scope='_'>
+        <i :class="_.vm.themeIconClasses" role="presentation" v-if="!_.model.loading"></i>
+        <span v-if='!_.model.editing'>
+          {{_.model.organization}}/{{_.model.title}}
+        </span>
+        <span v-if='!_.model.editing'>
+          {{_.model.name.given}}/{{_.model.name.family}}
+        </span>
+        <span v-if='!_.model.editing'>
+          {{_.model.email}}
+        </span>
+      </template>
+    </tree>
   </div>
 </template>
 
@@ -41,23 +53,9 @@ module.exports =
     model:
       extends: require('vue.model/src/model').default
       methods:
-        ou: (data) ->
-          if data.organization? or data.title?
-            "#{data.organization || ''}/#{data.title || ''}"
-          else
-            ''
-        fullname: (data) ->
-          {given, family} = data.name
-          if given? or family?
-            "#{given || ''} #{family || ''}"
-          else
-            ''
-        display: (data) ->
-          "#{@ou data} #{@fullname data} #{data.email}"
         format: (data) ->
           _.extend data,
             icon: 'fa fa-user icon-state-default'
-            display: "#{@display data}"
             subordinates: data.subordinates?.map @format
         getUsers: (supervisor = null) ->
           gen = @listAll
