@@ -1,4 +1,4 @@
 #!/bin/sh
 
-npm run build
-node app.js --prod
+(cd frontend && npm run build)
+(cd backend && npm start)

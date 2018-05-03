@@ -19,10 +19,12 @@
       multiple
       :data='users'
       :showCheckbox='true'
-      :text-field-name='"display"'
-      :value-field-name='"email"'
+      text-field-name='display'
+      value-field-name='email'
+      children-field-name='subordinates'
       :draggable='true'
-      :async='load' />
+      @item-toggle='toggleUser'
+      @item-drop='updateSupervisor' />
   </div>
 </template>
 
@@ -30,29 +32,12 @@
 _ = require 'lodash'
 Vue = require('vue').default
 Vue.use require('vue.oauth2/src/plugin').default
-tree = require('vue-jstree').default
 
 module.exports =
   components:
     fab: require('vue-fab').default
     tree:
-      extends: tree
-      methods:
-        onItemDrop: (e, oriNode, oriItem) ->
-          supervisor = oriNode.model.email
-          subordinate = @draggedItem.item.email
-          if supervisor == subordinate
-            return
-          node = @draggedItem
-          {parentItem, index} = @draggedItem
-          @$parent.$refs.user
-            .update subordinate,
-              data:
-                supervisor: supervisor
-            .then =>
-              parentItem.splice index, 1
-              oriNode.model.addChild node
-              oriNode.model.openChildren()
+      extends: require('vue-jstree').default
     model:
       extends: require('vue.model/src/model').default
       methods:
@@ -70,12 +55,22 @@ module.exports =
         display: (data) ->
           "#{@ou data} #{@fullname data} #{data.email}"
         format: (data) ->
-          data.subordinates = data.subordinates?.map @format
           _.extend data,
             icon: 'fa fa-user icon-state-default'
             display: "#{@display data}"
-            children: data.subordinates
-            parent: data.supervisor
+            subordinates: data.subordinates?.map @format
+        getUsers: (supervisor = null) ->
+          gen = @listAll
+            data:
+              supervisor: supervisor
+              sort:
+                organization: 1
+          gen()
+        dropUser: ({subordinate, supervisor}) ->
+          await @update 
+            data:
+              id: subordinate
+              supervisor: supervisor
   data: ->
     searchword: ''
     users: []
@@ -93,52 +88,54 @@ module.exports =
         { name: 'collapse', tooltip: 'Collapse All', icon: 'indeterminate_check_box' }
       ]
   methods:
-    load: (oriNode, cb) ->
-      ret = []
-      gen = @$refs.user?.listAll
-        data:
-          supervisor: if oriNode.model? then oriNode.model.email else null
-          sort:
-            organization: 1
-      if gen?
-        {next} = gen()
+    updateSupervisor: (node, item, draggedItem, e) ->
+      data =
+        supervisor: item.email
+        subordinate: draggedItem.email
+      await @$refs.user.dropUser data
+      _.extend item, await @$refs.user.get data: id: item.email
+    toggleUser: (node, item, e) ->
+      if item.opened
+        item.subordinates.splice 0, item.subordinates.length
+        {next} = @$refs.user.getUsers item.email
         while true
-          {done, value} = await next ret.length
+          {done, value} = await next item.subordinates.length
           break if done
-          ret = ret.concat value
-      cb ret
-    dfs: (nodes, func) ->
-      nodes.map (user, key, list) =>
-        if user.children?
-          @dfs user.children, func
-        func user, key, list
+          for i in value
+            item.subordinates.push i
+    dfs: (nodes = @users) ->
+      for index, user of nodes
+        yield {list: nodes, key: index, node: user}
+        if user.subordinates?
+          yield from @dfs user.subordinates
     selected: (nodes = @users) ->
       ret = []
-      @dfs nodes, (user, key, list) ->
-        if user.selected
-          ret.push
-            list: list
-            key: key
-            node: user
+      for {list, key, node} from @dfs nodes
+        if node.selected
+          ret.push {list, key, node}
       ret
     create: ->
       console.log 'collapse'
     destroy: ->
       @selected().map ({list, key, node}) =>
-        @$refs.user
-          .delete node.email
-          .then ->
-            list.splice key, 1
+        await @$refs.user.delete data: id: node.email
+        index = list.findIndex (user) ->
+          user.email == node.email
+        list.splice index, 1
     expand: (nodes = @users) ->
-      nodes.map (user) =>
-        user.openChildren()
-        if user.children?
-          @expand user.children
+      for {list, key, node} from @dfs nodes
+        node.opened = true
+        await @toggleUser null, node
     collapse: (nodes = @users) ->
-      nodes.map (user) =>
-        user.opened = false
-        if user.subordinates?
-          @collapse user.subordinates
+      for {list, key, node} from @dfs nodes
+        node.opened = false
+  mounted: ->
+    {next} = @$refs.user.getUsers()
+    while true
+      {done, value} = await next @users.length
+      break if done
+      for i in value
+        @users.push i
 </script>
 
 <style>
