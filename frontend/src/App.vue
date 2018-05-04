@@ -25,16 +25,65 @@
       @item-toggle='toggleUser'
       @item-drop='updateSupervisor'>
       <template slot-scope='_'>
-        <i :class="_.vm.themeIconClasses" role="presentation" v-if="!_.model.loading"></i>
-        <span v-if='!_.model.editing'>
-          {{_.model.organization}}/{{_.model.title}}
-        </span>
-        <span v-if='!_.model.editing'>
-          {{_.model.name.given}}/{{_.model.name.family}}
-        </span>
-        <span v-if='!_.model.editing'>
-          {{_.model.email}}
-        </span>
+        <template v-if='!_.model.editing'>
+          <i :class="_.vm.themeIconClasses" role="presentation"></i>
+          <span>
+            {{_.model.organization}}/{{_.model.title}}
+          </span>
+          <span>
+            {{_.model.name.given}} {{_.model.name.family}}
+          </span>
+          <a :href='"mailto:" + _.model.email'>
+            {{_.model.email}}
+          </a>
+          <a :href='"tel:" + _.model.phone[0].value' v-if='_.model.phone'>
+            {{_.model.phone[0].value}}
+          </a>
+        </template>
+        <template v-if='_.model.editing'>
+          <b-form-input
+            v-model='_.model.organization'
+            type='text'
+            placeholder='Organization'
+            required />
+          <b-form-input
+            v-model='_.model.title'
+            type='text'
+            placeholder='Title'
+            required />
+          <b-form-input
+            v-model='_.model.name.given'
+            type='text'
+            placeholder='Given Name'
+            required />
+          <b-form-input
+            v-model='_.model.name.family'
+            type='text'
+            placeholder='Surname'
+            required />
+          <b-form-input
+            v-model='_.model.email'
+            type='text'
+            placeholder='Email'
+            required />
+          <b-form-input
+            v-model='_.model.phone'
+            type='tel'
+            placeholder='Phone No'
+            required />
+          <b-button 
+            @click.stop='save'
+            size='sm'
+            variant='primary'>
+            Add
+          </b-button>
+          <b-button
+            @click.stop='cancel'
+            size='sm'
+            variant='secondary'>
+            Cancel
+          </b-button>
+        </template>
       </template>
     </tree>
   </div>
@@ -113,7 +162,25 @@ module.exports =
           ret.push {list, key, node}
       ret
     create: ->
-      console.log 'collapse'
+      @users.unshift @$refs.user.format
+        email: ''
+        name:
+          given: ''
+          family: ''
+        organization: ''
+        title: ''
+        phone: ''
+        editing: true
+      window.scrollTo 0, 0
+    save: ->
+      @users[0].phone = [
+        type: 'Office'
+        value: @users[0].phone
+      ]
+      _.extend @users[0], await @$refs.user.create data: @users[0]
+      @users[0].editing = false
+    cancel: ->
+      @users.shift()
     destroy: ->
       @selected().map ({list, key, node}) =>
         await @$refs.user.delete data: id: node.email
@@ -136,7 +203,7 @@ module.exports =
         @users.push i
 </script>
 
-<style>
+<style scoped>
 @import 'https://use.fontawesome.com/releases/v5.0.9/css/all.css';
 @import 'https://fonts.googleapis.com/icon?family=Material+Icons';
 @import 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css';
@@ -147,5 +214,38 @@ module.exports =
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+}
+
+input {
+  display: inline-block;
+  padding: 0;
+}
+
+input[placeholder=Organization] {
+  width: 12ch;
+}
+
+input[placeholder=Title] {
+  width: 6ch;
+}
+
+input[placeholder='Given Name'] {
+  width: 12ch;
+}
+
+input[placeholder=Surname] {
+  width: 8ch;
+}
+
+input[placeholder='Email'] {
+  width: 20ch;
+}
+
+input[placeholder='Phone No'] {
+  width: 10ch;
+}
+
+button {
+  margin-left: 2px;
 }
 </style>
