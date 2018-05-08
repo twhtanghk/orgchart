@@ -27,7 +27,7 @@ module.exports =
       type: 'string'
 
     phone:
-      type: 'array'
+      type: 'json'
 
     supervisor:
       model: 'user'
@@ -108,3 +108,13 @@ module.exports =
       .then ->
         cb()
       .catch cb
+
+  updateCreate: (value) ->
+    @findOne email: value.email
+      .then (user) =>
+        if user?
+          @update email: value.email, _.pick(value, 'name', 'organization', 'title', 'phone')
+        else
+          @create value
+      .then =>
+        @findOne email: value.email
