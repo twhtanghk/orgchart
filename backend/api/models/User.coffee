@@ -110,11 +110,13 @@ module.exports =
       .catch cb
 
   updateCreate: (value) ->
-    @findOne email: value.email
+    cond = email: value.email
+    @findOne cond
       .then (user) =>
         if user?
-          @update email: value.email, _.pick(value, 'name', 'organization', 'title', 'phone')
+          @update cond, _.pick(value, 'name', 'organization', 'title', 'phone', 'supervisor')
         else
           @create value
       .then =>
-        @findOne email: value.email
+        @findOne cond
+          .populateAll()
