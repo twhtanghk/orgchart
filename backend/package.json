@@ -62,7 +62,6 @@
     "babel-preset-stage-2": "^6.24.1",
     "coffee-loader": "^0.7.3",
     "css-loader": "^0.28.4",
-    "csv": "^1.1.1",
     "email-addresses": "^3.0.1",
     "mocha": "^3.4.2",
     "node-sass": "^4.5.3",

@@ -3,16 +3,22 @@
     <fab 
       bg-color='#007bff'
       :actions='actions'
+      @upload='upload'
       @create='create'
       @destroy='destroy'
       @expand='expand'
-      @collapse='collapse' />
+      @collapse='collapse'>
+      <template slot='icon' slot-scope='{action}' v-if='action.tooltip == "Upload"'>
+        <upload :action='action' />
+      </template>
+    </fab>
     <authForm
       :eventBus='eventBus'
       :oauth2='oauth2' />
     <model
       ref='user'
       :eventBus='eventBus'
+      idAttribute='email'
       baseUrl='http://172.24.0.3:1337/api/user' />
     <tree 
       ref='tree'
@@ -24,50 +30,50 @@
       :draggable='true'
       @item-toggle='toggleUser'
       @item-drop='updateSupervisor'>
-      <template slot-scope='_'>
-        <template v-if='!_.model.editing'>
-          <i :class="_.vm.themeIconClasses" role="presentation"></i>
-          <span>
-            {{_.model.organization}}/{{_.model.title}}
+      <template slot-scope='{model, vm}'>
+        <template v-if='!model.editing'>
+          <i :class="vm.themeIconClasses" role="presentation"></i>
+          <span v-if='model.organization || model.title'>
+            {{model.organization}}/{{model.title}}
           </span>
-          <span>
-            {{_.model.name.given}} {{_.model.name.family}}
+          <span v-if='model.name'>
+            {{model.name.given}} {{model.name.family}}
           </span>
-          <a :href='"mailto:" + _.model.email'>
-            {{_.model.email}}
+          <a :href='"mailto:" + model.email'>
+            {{model.email}}
           </a>
-          <a :href='"tel:" + _.model.phone[0].value' v-if='_.model.phone'>
-            {{_.model.phone[0].value}}
+          <a :href='"tel:" + model.phone.office' v-if='model.phone'>
+            {{model.phone.office}}
           </a>
         </template>
-        <template v-if='_.model.editing'>
+        <template v-if='model.editing'>
           <b-form-input
-            v-model='_.model.organization'
+            v-model='model.organization'
             type='text'
             placeholder='Organization'
             required />
           <b-form-input
-            v-model='_.model.title'
+            v-model='model.title'
             type='text'
             placeholder='Title'
             required />
           <b-form-input
-            v-model='_.model.name.given'
+            v-model='model.name.given'
             type='text'
             placeholder='Given Name'
             required />
           <b-form-input
-            v-model='_.model.name.family'
+            v-model='model.name.family'
             type='text'
             placeholder='Surname'
             required />
           <b-form-input
-            v-model='_.model.email'
+            v-model='model.email'
             type='text'
             placeholder='Email'
             required />
           <b-form-input
-            v-model='_.model.phone'
+            v-model='model.phone'
             type='tel'
             placeholder='Phone No'
             required />
@@ -90,12 +96,16 @@
 </template>
 
 <script lang='coffee'>
+stream = require 'stream'
+FileReadStream = require 'filestream/read'
+Parser = require('csv').parse
 _ = require 'lodash'
 Vue = require('vue').default
 Vue.use require('vue.oauth2/src/plugin').default
 
 module.exports =
   components:
+    upload: require('vue-fab/src/upload').default
     fab: require('vue-fab').default
     tree:
       extends: require('vue-jstree').default
@@ -116,7 +126,7 @@ module.exports =
         dropUser: ({subordinate, supervisor}) ->
           await @update 
             data:
-              id: subordinate
+              email: subordinate
               supervisor: supervisor
   data: ->
     searchword: ''
@@ -129,7 +139,8 @@ module.exports =
       response_type: 'token'
     actions:
       [
-        { name: 'create', tooltip: 'Create', icon: 'add' }
+        { name: 'upload', tooltip: 'Upload', icon: 'file_upload' }
+        { name: 'create', tooltip: 'Create', icon: 'person_add' }
         { name: 'destroy', tooltip: 'Delete', icon: 'delete' }
         { name: 'expand', tooltip: 'Expand All', icon: 'add_box' }
         { name: 'collapse', tooltip: 'Collapse All', icon: 'indeterminate_check_box' }
@@ -140,7 +151,7 @@ module.exports =
         supervisor: item.email
         subordinate: draggedItem.email
       await @$refs.user.dropUser data
-      _.extend item, await @$refs.user.get data: id: item.email
+      _.extend item, await @$refs.user.get data: email: item.email
     toggleUser: (node, item, e) ->
       if item.opened
         item.subordinates.splice 0, item.subordinates.length
@@ -161,6 +172,38 @@ module.exports =
         if node.selected
           ret.push {list, key, node}
       ret
+    upload: (files) ->
+      model = @$refs.user
+
+      class CSV extends stream.Writable
+        _write: (chunk, encoding, cb) ->
+          [ input, title, org ] = /([ a-zA-Z0-9]*)(\(*.*)/.exec chunk['Job Title'].trim()
+          user =
+            email: chunk['Internet Address']
+            name:
+              given: chunk['First Name']
+              family: chunk['Last Name']
+            organization: org
+            title: title
+            phone:
+              office: chunk['Business Phone']
+          model
+            .update data: user
+            .then ->
+              cb()
+            .catch (err) ->
+              console.log
+                data: user
+                err: err
+              cb()
+
+      for file in files
+        new FileReadStream file
+          .on 'error', console.error
+          .pipe new Parser columns: true
+          .on 'error', console.error
+          .pipe new CSV objectMode: true
+          .on 'error', console.error
     create: ->
       @users.unshift @$refs.user.format
         email: ''
@@ -173,17 +216,15 @@ module.exports =
         editing: true
       window.scrollTo 0, 0
     save: ->
-      @users[0].phone = [
-        type: 'Office'
-        value: @users[0].phone
-      ]
+      @users[0].phone =
+        office: @users[0].phone
       _.extend @users[0], await @$refs.user.create data: @users[0]
       @users[0].editing = false
     cancel: ->
       @users.shift()
     destroy: ->
       @selected().map ({list, key, node}) =>
-        await @$refs.user.delete data: id: node.email
+        await @$refs.user.delete data: email: node.email
         index = list.findIndex (user) ->
           user.email == node.email
         list.splice index, 1
