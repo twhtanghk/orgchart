@@ -5,6 +5,7 @@
       :actions='actions'
       @upload='upload'
       @create='create'
+      @update='update'
       @destroy='destroy'
       @expand='expand'
       @collapse='collapse'>
@@ -18,7 +19,6 @@
     <model
       ref='user'
       :eventBus='eventBus'
-      idAttribute='email'
       baseUrl='http://172.24.0.3:1337/api/user' />
     <tree 
       ref='tree'
@@ -28,6 +28,8 @@
       value-field-name='email'
       children-field-name='subordinates'
       :draggable='true'
+      @item-drag-start='dragStart'
+      @item-drag-end='dragEnd'
       @item-toggle='toggleUser'
       @item-drop='updateSupervisor'>
       <template slot-scope='{model, vm}'>
@@ -73,18 +75,18 @@
             placeholder='Email'
             required />
           <b-form-input
-            v-model='model.phone'
+            v-model='model.phone.office'
             type='tel'
             placeholder='Phone No'
             required />
           <b-button 
-            @click.stop='save'
+            @click.stop='save(model)'
             size='sm'
             variant='primary'>
-            Add
+            Save
           </b-button>
           <b-button
-            @click.stop='cancel'
+            @click.stop='cancel(model)'
             size='sm'
             variant='secondary'>
             Cancel
@@ -96,7 +98,7 @@
 </template>
 
 <script lang='coffee'>
-stream = require 'stream'
+{Writable} = require 'stream'
 FileReadStream = require 'filestream/read'
 Parser = require('csv').parse
 _ = require 'lodash'
@@ -108,7 +110,7 @@ module.exports =
     upload: require('vue-fab/src/upload').default
     fab: require('vue-fab').default
     tree:
-      extends: require('vue-jstree').default
+      extends: require('vue-jstree/src/tree').default
     model:
       extends: require('vue.model/src/model').default
       methods:
@@ -116,18 +118,29 @@ module.exports =
           _.extend data,
             icon: 'fa fa-user icon-state-default'
             subordinates: data.subordinates?.map @format
+            opened: false
+        reload: (user) ->
+          user.subordinates.splice 0, user.subordinates.length
+          {next} = @getUsers user.id
+          while true
+            {done, value} = await next user.subordinates.length
+            break if done
+            for i in value
+              user.subordinates.push i
         getUsers: (supervisor = null) ->
           gen = @listAll
             data:
               supervisor: supervisor
-              sort:
-                organization: 1
+              sort: [
+                organization: 'ASC'
+              ]
           gen()
         dropUser: ({subordinate, supervisor}) ->
-          await @update 
+          await @post
             data:
-              email: subordinate
-              supervisor: supervisor
+              id: subordinate.id
+              email: subordinate.email
+              supervisor: supervisor.id
   data: ->
     searchword: ''
     users: []
@@ -141,6 +154,7 @@ module.exports =
       [
         { name: 'upload', tooltip: 'Upload', icon: 'file_upload' }
         { name: 'create', tooltip: 'Create', icon: 'person_add' }
+        { name: 'update', tooltip: 'Update', icon: 'edit' }
         { name: 'destroy', tooltip: 'Delete', icon: 'delete' }
         { name: 'expand', tooltip: 'Expand All', icon: 'add_box' }
         { name: 'collapse', tooltip: 'Collapse All', icon: 'indeterminate_check_box' }
@@ -148,19 +162,19 @@ module.exports =
   methods:
     updateSupervisor: (node, item, draggedItem, e) ->
       data =
-        supervisor: item.email
-        subordinate: draggedItem.email
+        supervisor: item
+        subordinate: draggedItem
       await @$refs.user.dropUser data
-      _.extend item, await @$refs.user.get data: email: item.email
+      await @$refs.user.reload data.supervisor
+    dragStart: (node, item, e) ->
+      for {list, key, node} from @dfs item.subordinates
+        node.dropDisabled = true
+    dragEnd: (node, item, e) ->
+      for {list, key, node} from @dfs item.subordinates
+        delete node.dropDisabled
     toggleUser: (node, item, e) ->
       if item.opened
-        item.subordinates.splice 0, item.subordinates.length
-        {next} = @$refs.user.getUsers item.email
-        while true
-          {done, value} = await next item.subordinates.length
-          break if done
-          for i in value
-            item.subordinates.push i
+        await @$refs.user.reload item
     dfs: (nodes = @users) ->
       for index, user of nodes
         yield {list: nodes, key: index, node: user}
@@ -174,35 +188,21 @@ module.exports =
       ret
     upload: (files) ->
       model = @$refs.user
-
-      class CSV extends stream.Writable
+      class Upload extends Writable
         _write: (chunk, encoding, cb) ->
-          [ input, title, org ] = /([ a-zA-Z0-9]*)(\(*.*)/.exec chunk['Job Title'].trim()
-          user =
-            email: chunk['Internet Address']
-            name:
-              given: chunk['First Name']
-              family: chunk['Last Name']
-            organization: org
-            title: title
-            phone:
-              office: chunk['Business Phone']
-          model
-            .update data: user
-            .then ->
-              cb()
-            .catch (err) ->
-              console.log
-                data: user
-                err: err
-              cb()
+          chunk.phone = office: chunk.tel
+          if chunk.email?
+            await model.post data: chunk
+          else
+            console.error "skip #{JSON.stringify chunk}"
+          cb()
 
+      vcard = require('./vcard.coffee').default
       for file in files
         new FileReadStream file
+          .pipe vcard
           .on 'error', console.error
-          .pipe new Parser columns: true
-          .on 'error', console.error
-          .pipe new CSV objectMode: true
+          .pipe new Upload objectMode: true
           .on 'error', console.error
     create: ->
       @users.unshift @$refs.user.format
@@ -215,18 +215,19 @@ module.exports =
         phone: ''
         editing: true
       window.scrollTo 0, 0
-    save: ->
-      @users[0].phone =
-        office: @users[0].phone
-      _.extend @users[0], await @$refs.user.create data: @users[0]
-      @users[0].editing = false
-    cancel: ->
-      @users.shift()
+    update: ->
+      @selected().map ({list, key, node}) ->
+        node.editing = true
+    save: (model) ->
+      _.extend model, await @$refs.user.create data: model
+      model.editing = false
+    cancel: (model) ->
+      model.editing = false
     destroy: ->
       @selected().map ({list, key, node}) =>
-        await @$refs.user.delete data: email: node.email
+        await @$refs.user.delete data: id: node.id
         index = list.findIndex (user) ->
-          user.email == node.email
+          user.id == node.id
         list.splice index, 1
     expand: (nodes = @users) ->
       for {list, key, node} from @dfs nodes
