@@ -11,9 +11,9 @@ passport.use 'bearer', new bearer.Strategy {} , (token, done) ->
   oauth2
     .verify process.env.VERIFYURL, process.env.SCOPE.split(' '), token
     .then (info) ->
+      user = _.pick info.user, 'email'
       sails.models.user
-        .findOrCreate _.pick(info.user, 'email')
-        .populateAll()
+        .findOrCreate user, user
     .then (user) ->
       done null, user
     .catch (err) ->

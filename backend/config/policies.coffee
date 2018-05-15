@@ -2,10 +2,7 @@ module.exports =
   policies:
     UserController:
       '*': false
-      create: ['isAuth', 'isAdmin']
       find: true
-      findOne: ['me']
+      findOne: true
       destroy: ['isAuth', 'me', 'canUpdate']
-      update: ['isAuth', 'me', 'canUpdate']
-      add: ['isAuth', 'me', 'canUpdate']
-      remove: ['isAuth', 'me', 'canUpdate']
+      create: ['isAuth', 'canUpdate']

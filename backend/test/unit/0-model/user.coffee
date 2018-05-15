@@ -5,11 +5,11 @@ url = require 'url'
 path = require 'path'
 _ = require 'lodash'
 
-[ 'AUTHURL' ].map (name) ->
+[ 'AUTH_URL' ].map (name) ->
   assert name of process.env, "process.env.#{name} not yet defined"
 
 userUrl = ->
-  userUrl = url.parse process.env.AUTHURL
+  userUrl = url.parse process.env.AUTH_URL
   url.format _.extend pathname: '/auth/api/users/', _.pick(userUrl, 'protocol', 'auth', 'host')
 
 oauthUsers = (url = userUrl()) ->

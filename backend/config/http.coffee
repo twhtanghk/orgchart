@@ -3,6 +3,7 @@ module.exports =
   http:
     middleware:
       nocache: require('nocache')()
+      methodOverride: require('method-override')()
       order: [
         'nocache'
         'bodyParser'
@@ -11,6 +12,4 @@ module.exports =
         'router'
         'www'
         'favicon'
-        '404'
-        '500'
       ]

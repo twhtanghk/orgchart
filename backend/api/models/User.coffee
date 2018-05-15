@@ -3,19 +3,19 @@ Promise = require 'bluebird'
 
 module.exports =
 
-  autoPK: false
-  
   tableName:  'user'
 
   schema: true
   
   attributes:
 
+    id:
+      type: 'string'
+      columnName: '_id'
+
     email:
-      type: 'email'
+      type: 'string'
       unique: true
-      required: true
-      primaryKey: true
 
     name:
       type: 'json'
@@ -36,65 +36,40 @@ module.exports =
       collection: 'user'
       via: 'supervisor'
 
-    # populate line managers of this user
-    lineManagers: ->
-      if @supervisor?
-        sails.models.user
-          .findOne _.pick @, 'email'
-          .populate 'supervisor'
-          .then (curr) ->
-            curr.supervisor.lineManagers()
-          .then (supervisor) ->
-            curr.supervisor = supervisor
-            return curr
-      else
-        Promise.resolve @
-
-    # return if this user is supervisor of the specified user
-    isSupervisor: (user) ->
-      if user.supervisor?
-        sails.models.user
-          .findOne _.pick user, 'email'
-          .populate 'supervisor'
-          .then (curr) ->
-            if not curr?
-              retrun false
-            else if curr.supervisor?.email == @mail
-              return true
-            else
-              @isSupervisor curr.supervisor
-      else
-        Promise.resolve false
-          
-    # return if this user subordinate of the specified user
-    isSubordinate: (user) ->
-      sails.models.user
-        .findOne _.pick user, 'email'
-        .then (curr) =>
-          if not curr?
-            return false
-          else
-            curr?.isSupervisor @
-          
-  beforeValidate: (values, cb) ->
-    if values.supervisor?
-      if values.supervisor == values.email
-        return cb new Error "assign user myself as supervisor"
-      sails.models.user
-        .findOne email: values.email
-        .then (curr) ->
-          if not curr?
-            cb()
-          else
-            curr
-              .isSupervisor(email: values.supervisor)
-              .then (isSupervisor) ->
-                if isSupervisor
-                  cb new Error "assign existing subordinate as supervisor"
-                else
-                  cb()
+  isSupervisor: (supervisor, subordinate) ->
+    if not ('supervisor' of subordinate and subordinate.supervisor?)
+      return false
+    else if subordinate.supervisor?.id == supervisor?.id
+      return true
     else
-      cb()
+      @findOne id: subordinate.supervisor.id || subordinate.supervisor
+        .populate 'supervisor'
+        .then (user) ->
+          sails.models.user.isSupervisor supervisor, user
+
+  selfSupervisor: (values) ->
+    if 'supervisor' of values and 'id' of values and values.supervisor? and values.id? and values.supervisor == values.id
+      throw new Error 'assign self as supervisor'
+
+  cyclicSupervisor: (values) ->
+    if values.supervisor?
+      @findOne id: values.supervisor?.id || values.supervisor
+        .then (supervisor) ->
+          if sails.models.user.isSupervisor values, supervisor
+            throw new Error 'assign existing suborindate as supervisor'
+ 
+  beforeCreate: (values, cb) ->
+    @beforeUpdate values, cb
+
+  beforeUpdate: (values, cb) ->
+    Promise
+      .all [
+        sails.models.user.selfSupervisor values
+        sails.models.user.cyclicSupervisor values
+      ]
+      .then ->
+        cb()
+      .catch cb
 
   beforeDestroy: (criteria, cb) ->
     sails.models.user
@@ -104,7 +79,9 @@ module.exports =
         Promise.map users, (user) ->
           Promise.map user.subordinates, (subordinate) ->
             subordinate.supervisor = null
-            subordinate.save().then Promise.resolve, Promise.reject
+            sails.models.user
+              .update {id: subordinate.id}, subordinate
+              .then Promise.resolve, Promise.reject
       .then ->
         cb()
       .catch cb
@@ -114,7 +91,7 @@ module.exports =
     @findOne cond
       .then (user) =>
         if user?
-          @update cond, _.pick(value, 'name', 'organization', 'title', 'phone', 'supervisor')
+          @update cond, _.pick(value, 'email', 'name', 'organization', 'title', 'phone', 'supervisor')
         else
           @create value
       .then =>
