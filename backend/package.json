@@ -13,9 +13,9 @@
     "passport-http-bearer": "^1.0.1",
     "sails": "~1.0.2",
     "sails-hook-orm": "^2.0.1",
-    "sails-mongo": "^1.0.1"
+    "sails-mongo": "^1.0.1",
     "sails-hook-mongo-auto-index": "https://github.com/twhtanghk/sails-hook-mongo-auto-index",
-    "sails-hook-requestlogger-file": "^2.0.5",
+    "sails-hook-requestlogger-file": "^2.0.5"
   },
   "scripts": {
     "debug": "node debug app.js",
@@ -26,6 +26,6 @@
   "license": "MIT",
   "devDependencies": {
     "mocha": "^5.1.1",
-    "supertest": "^3.1.0",
+    "supertest": "^3.1.0"
   }
 }
