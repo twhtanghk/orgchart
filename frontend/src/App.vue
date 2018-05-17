@@ -20,80 +20,7 @@
       ref='user'
       :eventBus='eventBus'
       baseUrl='http://172.24.0.3:1337/api/user' />
-    <tree 
-      ref='tree'
-      multiple
-      :data='users'
-      :showCheckbox='true'
-      value-field-name='email'
-      children-field-name='subordinates'
-      :draggable='true'
-      @item-drag-start='dragStart'
-      @item-drag-end='dragEnd'
-      @item-toggle='toggleUser'
-      @item-drop='updateSupervisor'>
-      <template slot-scope='{model, vm}'>
-        <template v-if='!model.editing'>
-          <i :class="vm.themeIconClasses" role="presentation"></i>
-          <span v-if='model.organization || model.title'>
-            {{model.organization}}/{{model.title}}
-          </span>
-          <span v-if='model.name'>
-            {{model.name.given}} {{model.name.family}}
-          </span>
-          <a :href='"mailto:" + model.email'>
-            {{model.email}}
-          </a>
-          <a :href='"tel:" + model.phone.office' v-if='model.phone'>
-            {{model.phone.office}}
-          </a>
-        </template>
-        <template v-if='model.editing'>
-          <b-form-input
-            v-model='model.organization'
-            type='text'
-            placeholder='Organization'
-            required />
-          <b-form-input
-            v-model='model.title'
-            type='text'
-            placeholder='Title'
-            required />
-          <b-form-input
-            v-model='model.name.given'
-            type='text'
-            placeholder='Given Name'
-            required />
-          <b-form-input
-            v-model='model.name.family'
-            type='text'
-            placeholder='Surname'
-            required />
-          <b-form-input
-            v-model='model.email'
-            type='text'
-            placeholder='Email'
-            required />
-          <b-form-input
-            v-model='model.phone.office'
-            type='tel'
-            placeholder='Phone No'
-            required />
-          <b-button 
-            @click.stop='save(model)'
-            size='sm'
-            variant='primary'>
-            Save
-          </b-button>
-          <b-button
-            @click.stop='cancel(model)'
-            size='sm'
-            variant='secondary'>
-            Cancel
-          </b-button>
-        </template>
-      </template>
-    </tree>
+    <tree ref='tree' :data='users' :remote='$refs.user' />
   </div>
 </template>
 
@@ -109,8 +36,7 @@ module.exports =
   components:
     upload: require('vue-fab/src/upload').default
     fab: require('vue-fab').default
-    tree:
-      extends: require('vue-jstree/src/tree').default
+    tree: require('./tree').default
     model:
       extends: require('vue.model/src/model').default
       methods:
@@ -160,32 +86,6 @@ module.exports =
         { name: 'collapse', tooltip: 'Collapse All', icon: 'indeterminate_check_box' }
       ]
   methods:
-    updateSupervisor: (node, item, draggedItem, e) ->
-      data =
-        supervisor: item
-        subordinate: draggedItem
-      await @$refs.user.dropUser data
-      await @$refs.user.reload data.supervisor
-    dragStart: (node, item, e) ->
-      for {list, key, node} from @dfs item.subordinates
-        node.dropDisabled = true
-    dragEnd: (node, item, e) ->
-      for {list, key, node} from @dfs item.subordinates
-        delete node.dropDisabled
-    toggleUser: (node, item, e) ->
-      if item.opened
-        await @$refs.user.reload item
-    dfs: (nodes = @users) ->
-      for index, user of nodes
-        yield {list: nodes, key: index, node: user}
-        if user.subordinates?
-          yield from @dfs user.subordinates
-    selected: (nodes = @users) ->
-      ret = []
-      for {list, key, node} from @dfs nodes
-        if node.selected
-          ret.push {list, key, node}
-      ret
     upload: (files) ->
       model = @$refs.user
       class Upload extends Writable
@@ -229,13 +129,10 @@ module.exports =
         index = list.findIndex (user) ->
           user.id == node.id
         list.splice index, 1
-    expand: (nodes = @users) ->
-      for {list, key, node} from @dfs nodes
-        node.opened = true
-        await @toggleUser null, node
-    collapse: (nodes = @users) ->
-      for {list, key, node} from @dfs nodes
-        node.opened = false
+    expand: ->
+      @$refs.tree.expand()
+    collapse: ->
+      @$refs.tree.collapse()
   mounted: ->
     {next} = @$refs.user.getUsers()
     while true
