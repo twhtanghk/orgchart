@@ -53,9 +53,13 @@ module.exports =
 
   cyclicSupervisor: (values) ->
     if values.supervisor?
-      @findOne id: values.supervisor?.id || values.supervisor
-        .then (supervisor) ->
-          if sails.models.user.isSupervisor values, supervisor
+      Promise
+        .all [
+          @findOne id: values.supervisor?.id || values.supervisor
+          @findOne email: values.email
+        ]
+        .then (supervisor, subordinate) ->
+          if sails.models.user.isSupervisor subordinate, supervisor
             throw new Error 'assign existing suborindate as supervisor'
  
   beforeCreate: (values, cb) ->
