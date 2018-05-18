@@ -1,4 +1,6 @@
 <template>
+  <div>
+  <model ref='remote' :users='data' baseUrl='http://172.24.0.3:1337/api/user' />
   <tree 
     multiple
     :data='data'
@@ -72,24 +74,26 @@
       </template>
     </template>
   </tree>
+  </div>
 </template>
 
 <script lang='coffee'>
+_ = require 'lodash'
 {Writable} = require 'stream'
 FileReadStream = require 'filestream/read'
 Parser = require('csv').parse
-_ = require 'lodash'
-Vue = require('vue').default
-Vue.use require('vue.oauth2/src/plugin').default
 
 module.exports =
   components:
-    tree:
-      extends: require('vue-jstree/src/tree').default
-  props: [
-    'data'
-    'remote'
-  ]
+    tree: require('vue-jstree/src/tree').default
+    model: require('./model').default
+  props:
+    eventBus:
+      type: Object
+      default: ->
+        require('vue.oauth2/src/eventBus').default
+  data: ->
+    data: []
   methods:
     dragStart: (node, item, e) ->
       for {list, key, node} from @dfs item.subordinates
@@ -99,7 +103,7 @@ module.exports =
         delete node.dropDisabled
     toggleUser: (node, item, e) ->
       if item.opened
-        await @remote.reload item
+        await @$refs.remote.reload item
     dfs: (nodes = @data) ->
       for index, user of nodes
         yield {list: nodes, key: index, node: user}
@@ -115,8 +119,54 @@ module.exports =
       data =
         supervisor: item
         subordinate: draggedItem
-      await @remote.dropUser data
-      await @remote.reload data.supervisor
+      await @$refs.remote.dropUser data
+      await @$refs.remote.reload data.supervisor
+    upload: (files) ->
+      model = @$refs.remote
+      class Upload extends Writable
+        _write: (chunk, encoding, cb) ->
+          chunk.phone = office: chunk.tel
+          if chunk.email?
+            await model.post data: chunk
+          else
+            console.error "skip #{JSON.stringify chunk}"
+          cb()
+
+      vcard = require('./vcard.coffee').default
+      for file in files
+        new FileReadStream file
+          .pipe vcard
+          .on 'error', console.error
+          .pipe new Upload objectMode: true
+          .on 'error', console.error
+    create: ->
+      @data.unshift @$refs.remote.format
+        email: ''
+        name:
+          given: ''
+          family: ''
+        organization: ''
+        title: ''
+        phone: ''
+        editing: true
+      window.scrollTo 0, 0
+    update: ->
+      @selected().map ({list, key, node}) ->
+        node.editing = true
+    save: (model) ->
+      _.extend model, await @$refs.remote.create data: model
+      model.editing = false
+    cancel: (model) ->
+      model.editing = false
+    destroy: ->
+      @selected().map ({list, key, node}) =>
+        await @$refs.remote.delete data: id: node.id
+        # remove deleted entry
+        index = list.findIndex (user) ->
+          user.id == node.id
+        list.splice index, 1
+        # append subordinates to root if any
+        @data.push node.subordinates...
     expand: (nodes = @data) ->
       for {list, key, node} from @dfs nodes
         node.opened = true
@@ -124,6 +174,14 @@ module.exports =
     collapse: (nodes = @data) ->
       for {list, key, node} from @dfs nodes
         node.opened = false
+  mounted: ->
+    @eventBus
+      .$on 'tree.upload', @upload
+      .$on 'tree.create', @create
+      .$on 'tree.update', @update
+      .$on 'tree.destroy', @destroy
+      .$on 'tree.expand', @expand
+      .$on 'tree.collapse', @collapse
 </script>
 
 <style scoped>
