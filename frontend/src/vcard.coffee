@@ -34,6 +34,7 @@ class JSONVCard extends Transform
       'tel'
       'title'
       'note'
+      'nickname'
     ]
     for i in attrs
       ret[i] = data[i]?._data?.trim()
@@ -64,6 +65,12 @@ class OrgAttr extends Transform
     @push chunk
     cb()
 
+class EmailAttr extends Transform
+  _transform: (chunk, encoding, cb) ->
+    chunk.email ?= chunk.nickname.split(';')[1]?.trim()
+    @push chunk
+    cb()
+
 class FilterInvalid extends Transform
   _transform: (chunk, encoding, cb) ->
     if not (chunk.email? and (chunk.email == '' or /^Dummy/.test chunk.email))
@@ -71,10 +78,11 @@ class FilterInvalid extends Transform
     cb()
     
 module.exports = 
-  default: pipe new LineStream(), 
-    new FilterLine pattern: /X\-LOTUS\-CHARSET\:UTF\-8/
-    new SplitVCard(), 
-    new JSONVCard(readableObjectMode: true), 
-    new FilterInvalid objectMode: true
-    new NameAttr objectMode: true
-    new OrgAttr objectMode: true
+  default: pipe new LineStream(),
+    new FilterLine(pattern: /X\-LOTUS\-CHARSET\:UTF\-8/),
+    new SplitVCard(),
+    new JSONVCard(readableObjectMode: true),
+    new EmailAttr(objectMode: true),
+    new FilterInvalid(objectMode: true),
+    new NameAttr(objectMode: true),
+    new OrgAttr(objectMode: true)
