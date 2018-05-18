@@ -1,79 +1,82 @@
 <template>
   <div>
-  <model ref='remote' :users='data' baseUrl='http://172.24.0.3:1337/api/user' />
-  <tree 
-    multiple
-    :data='data'
-    :showCheckbox='true'
-    value-field-name='email'
-    children-field-name='subordinates'
-    :draggable='true'
-    @item-drag-start='dragStart'
-    @item-drag-end='dragEnd'
-    @item-toggle='toggleUser'
-    @item-drop='updateSupervisor'>
-    <template slot-scope='{model, vm}'>
-      <template v-if='!model.editing'>
-        <i :class="vm.themeIconClasses" role="presentation"></i>
-        <span v-if='model.organization || model.title'>
-          {{model.organization}}/{{model.title}}
-        </span>
-        <span v-if='model.name'>
-          {{model.name.given}} {{model.name.family}}
-        </span>
-        <a :href='"mailto:" + model.email'>
-          {{model.email}}
-        </a>
-        <a :href='"tel:" + model.phone.office' v-if='model.phone'>
-          {{model.phone.office}}
-        </a>
+    <model 
+      ref='remote'
+      :users='data'
+      baseUrl='http://172.24.0.3:1337/api/user' />
+    <tree 
+      multiple
+      :data='data'
+      :showCheckbox='true'
+      value-field-name='email'
+      children-field-name='subordinates'
+      :draggable='true'
+      @item-drag-start='dragStart'
+      @item-drag-end='dragEnd'
+      @item-toggle='toggleUser'
+      @item-drop='updateSupervisor'>
+      <template slot-scope='{model, vm}'>
+        <template v-if='!model.editing'>
+          <i :class="vm.themeIconClasses" role="presentation"></i>
+          <span v-if='model.organization || model.title'>
+            {{model.organization}}/{{model.title}}
+          </span>
+          <span v-if='model.name'>
+            {{model.name.given}} {{model.name.family}}
+          </span>
+          <a :href='"mailto:" + model.email'>
+            {{model.email}}
+          </a>
+          <a :href='"tel:" + model.phone.office' v-if='model.phone'>
+            {{model.phone.office}}
+          </a>
+        </template>
+        <template v-if='model.editing'>
+          <b-form-input
+            v-model='model.organization'
+            type='text'
+            placeholder='Organization'
+            required />
+          <b-form-input
+            v-model='model.title'
+            type='text'
+            placeholder='Title'
+            required />
+          <b-form-input
+            v-model='model.name.given'
+            type='text'
+            placeholder='Given Name'
+            required />
+          <b-form-input
+            v-model='model.name.family'
+            type='text'
+            placeholder='Surname'
+            required />
+          <b-form-input
+            v-model='model.email'
+            type='text'
+            placeholder='Email'
+            required />
+          <b-form-input
+            v-model='model.phone.office'
+            type='tel'
+            placeholder='Phone No'
+            required />
+          <b-button 
+            @click.stop='save(model)'
+            size='sm'
+            variant='primary'>
+            Save
+          </b-button>
+          <b-button
+            @click.stop='cancel(model)'
+            size='sm'
+            variant='secondary'>
+            Cancel
+          </b-button>
+        </template>
       </template>
-      <template v-if='model.editing'>
-        <b-form-input
-          v-model='model.organization'
-          type='text'
-          placeholder='Organization'
-          required />
-        <b-form-input
-          v-model='model.title'
-          type='text'
-          placeholder='Title'
-          required />
-        <b-form-input
-          v-model='model.name.given'
-          type='text'
-          placeholder='Given Name'
-          required />
-        <b-form-input
-          v-model='model.name.family'
-          type='text'
-          placeholder='Surname'
-          required />
-        <b-form-input
-          v-model='model.email'
-          type='text'
-          placeholder='Email'
-          required />
-        <b-form-input
-          v-model='model.phone.office'
-          type='tel'
-          placeholder='Phone No'
-          required />
-        <b-button 
-          @click.stop='save(model)'
-          size='sm'
-          variant='primary'>
-          Save
-        </b-button>
-        <b-button
-          @click.stop='cancel(model)'
-          size='sm'
-          variant='secondary'>
-          Cancel
-        </b-button>
-      </template>
-    </template>
-  </tree>
+    </tree>
   </div>
 </template>
 
