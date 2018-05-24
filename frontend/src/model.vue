@@ -18,14 +18,24 @@ module.exports =
         subordinates: data.subordinates?.map @format
         opened: false
     reload: (user) ->
+      user.subordinates ?= []
       user.subordinates.splice 0, user.subordinates.length
-      {next} = @getUsers user.id
+      {next} = @getSubordinates user.id
       while true
         {done, value} = await next user.subordinates.length
         break if done
         for i in value
           user.subordinates.push i
-    getUsers: (supervisor = null) ->
+    iterSupervisor: (user) ->
+      if 'supervisor' of user and user.supervisor?
+        yield from @iterSupervisor user.supervisor
+      yield user
+    getSupervisor: (user) ->
+      if 'supervisor' of user and user.supervisor?
+        user.supervisor = await @read data: id: user.supervisor.id
+        user.supervisor = await @getSupervisor user.supervisor
+      user    
+    getSubordinates: (supervisor = null) ->
       gen = @listAll
         data:
           supervisor: supervisor
@@ -54,7 +64,7 @@ module.exports =
       scope: 'User'
       response_type: 'token'
   mounted: ->
-    {next} = @getUsers()
+    {next} = @getSubordinates()
     while true
       {done, value} = await next @users.length
       break if done

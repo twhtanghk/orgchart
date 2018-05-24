@@ -22,6 +22,7 @@
     "less": "^3.0.4",
     "less-loader": "^4.1.0",
     "multipipe": "^2.0.3",
+    "muse-ui": "^2.1.0",
     "node-sass": "^4.9.0",
     "sass-loader": "^7.0.1",
     "vcf": "^2.0.1",

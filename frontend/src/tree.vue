@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id='tree'>
     <model 
       ref='remote'
       :users='data'
@@ -124,6 +124,30 @@ module.exports =
         subordinate: draggedItem
       await @$refs.remote.dropUser data
       await @$refs.remote.reload data.supervisor
+    search: (value) ->
+      cond = contains: value
+      gen = @$refs.remote.listAll
+        data:
+          or: [
+            {email: cond}
+            {organization: cond}
+          ]
+      {next} = gen()
+      skip = 0
+      while true
+        {done, value} = await next skip
+        break if done
+        for i in value
+          user = await @$refs.remote.getSupervisor i
+          list = @data
+          for j from @$refs.remote.iterSupervisor user
+            supervisor = list.find (user) ->
+              user.email == j.email
+            supervisor.opened = true
+            if not supervisor.subordinates?
+              await @toggleUser null, supervisor
+            list = supervisor.subordinates
+        skip += value.length
     upload: (files) ->
       model = @$refs.remote
       class Upload extends Writable
@@ -179,6 +203,7 @@ module.exports =
         node.opened = false
   mounted: ->
     @eventBus
+      .$on 'tree.search', @search
       .$on 'tree.upload', @upload
       .$on 'tree.create', @create
       .$on 'tree.update', @update
@@ -188,6 +213,10 @@ module.exports =
 </script>
 
 <style scoped>
+div#tree {
+  padding-top: 64px;
+}
+
 input {
   display: inline-block;
   padding: 0;

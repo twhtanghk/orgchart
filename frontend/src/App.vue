@@ -1,13 +1,15 @@
 <template>
   <div id="app">
-    <fab />
+    <appbar />
     <tree />
+    <fab />
   </div>
 </template>
 
 <script lang='coffee'>
 module.exports =
   components:
+    appbar: require('./appbar').default
     fab: require('./fab').default
     tree: require('./tree').default
 </script>
