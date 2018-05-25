@@ -133,9 +133,8 @@ module.exports =
             {organization: cond}
           ]
       {next} = gen()
-      skip = 0
       while true
-        {done, value} = await next skip
+        {done, value} = await next()
         break if done
         for i in value
           user = await @$refs.remote.getSupervisor i
@@ -147,7 +146,6 @@ module.exports =
             if not supervisor.subordinates?
               await @toggleUser null, supervisor
             list = supervisor.subordinates
-        skip += value.length
     upload: (files) ->
       model = @$refs.remote
       class Upload extends Writable
