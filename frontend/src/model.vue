@@ -22,7 +22,7 @@ module.exports =
       user.subordinates.splice 0, user.subordinates.length
       {next} = @getSubordinates user.id
       while true
-        {done, value} = await next user.subordinates.length
+        {done, value} = await next()
         break if done
         for i in value
           user.subordinates.push i
@@ -66,7 +66,7 @@ module.exports =
   mounted: ->
     {next} = @getSubordinates()
     while true
-      {done, value} = await next @users.length
+      {done, value} = await next()
       break if done
       for i in value
         @users.push i

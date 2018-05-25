@@ -24,6 +24,8 @@
     "multipipe": "^2.0.3",
     "muse-ui": "^2.1.0",
     "node-sass": "^4.9.0",
+    "rxjs": "^6.2.0",
+    "rxjs-to-async-iterator": "^2.1.3",
     "sass-loader": "^7.0.1",
     "vcf": "^2.0.1",
     "vue-async-computed": "^3.3.1",
