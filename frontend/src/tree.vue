@@ -3,7 +3,7 @@
     <model 
       ref='remote'
       :users='data'
-      baseUrl='http://172.24.0.3:1337/api/user' />
+      baseUrl='http://172.19.0.3:1337/api/user' />
     <tree 
       multiple
       :data='data'
@@ -126,26 +126,21 @@ module.exports =
       await @$refs.remote.reload data.supervisor
     search: (value) ->
       cond = contains: value
-      gen = @$refs.remote.listAll
-        data:
-          or: [
-            {email: cond}
-            {organization: cond}
-          ]
-      {next} = gen()
-      while true
-        {done, value} = await next()
-        break if done
-        for i in value
-          user = await @$refs.remote.getSupervisor i
-          list = @data
-          for j from @$refs.remote.iterSupervisor user
-            supervisor = list.find (user) ->
-              user.email == j.email
-            supervisor.opened = true
-            if not supervisor.subordinates?
-              await @toggleUser null, supervisor
-            list = supervisor.subordinates
+      data =
+        or: [
+          {email: cond}
+          {organization: cond}
+        ]
+      for await i from @$refs.remote.listAll data: data
+        user = await @$refs.remote.getSupervisor i
+        list = @data
+        for j from @$refs.remote.iterSupervisor user
+          supervisor = list.find (user) ->
+            user.email == j.email
+          supervisor.opened = true
+          if not supervisor.subordinates?
+            await @toggleUser null, supervisor
+          list = supervisor.subordinates
     upload: (files) ->
       model = @$refs.remote
       class Upload extends Writable

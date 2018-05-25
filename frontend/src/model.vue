@@ -20,12 +20,8 @@ module.exports =
     reload: (user) ->
       user.subordinates ?= []
       user.subordinates.splice 0, user.subordinates.length
-      {next} = @getSubordinates user.id
-      while true
-        {done, value} = await next()
-        break if done
-        for i in value
-          user.subordinates.push i
+      for await i from @getSubordinates user.id
+        user.subordinates.push i
     iterSupervisor: (user) ->
       if 'supervisor' of user and user.supervisor?
         yield from @iterSupervisor user.supervisor
@@ -36,13 +32,12 @@ module.exports =
         user.supervisor = await @getSupervisor user.supervisor
       user    
     getSubordinates: (supervisor = null) ->
-      gen = @listAll
+      @listAll
         data:
           supervisor: supervisor
           sort: [
             organization: 'ASC'
           ]
-      gen()
     dropUser: ({subordinate, supervisor}) ->
       await @post
         data:
@@ -64,10 +59,6 @@ module.exports =
       scope: 'User'
       response_type: 'token'
   mounted: ->
-    {next} = @getSubordinates()
-    while true
-      {done, value} = await next()
-      break if done
-      for i in value
-        @users.push i
+    for await i from @getSubordinates()
+      @users.push i
 </script>
