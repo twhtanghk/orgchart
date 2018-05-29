@@ -9,7 +9,6 @@ _ = require 'lodash'
 Vue = require('vue').default
 Vue.use require('vue.oauth2/src/plugin').default
 sortBy = require 'sort-by'
-bs = require 'binarysearch'
 
 module.exports =
   extends: require('vue.model/src/model').default
@@ -24,7 +23,8 @@ module.exports =
       user.subordinates ?= []
       user.subordinates.splice 0, user.subordinates.length
       for await i from @getSubordinates user.id
-        bs.insert user.subordinates, i, @compare
+        user.subordinates.push i
+      user.subordinates.sort @compare
     iterSupervisor: (user) ->
       if 'supervisor' of user and user.supervisor?
         yield from @iterSupervisor user.supervisor
@@ -60,5 +60,6 @@ module.exports =
       response_type: 'token'
   created: ->
     for await i from @getSubordinates()
-      bs.insert @users, i, @compare
+      @users.push i
+    @users.sort @compare
 </script>

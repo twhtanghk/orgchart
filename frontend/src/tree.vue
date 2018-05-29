@@ -21,8 +21,8 @@
           <span v-if='model.organization || model.title'>
             {{model.organization}}/{{model.title}}
           </span>
-          <span v-if='model.name'>
-            {{model.name.given}} {{model.name.family}}
+          <span>
+            {{model.givenName}} {{model.familyName}}
           </span>
           <a :href='"mailto:" + model.email'>
             {{model.email}}
@@ -43,12 +43,12 @@
             placeholder='Title'
             required />
           <b-form-input
-            v-model='model.name.given'
+            v-model='model.givenName'
             type='text'
             placeholder='Given Name'
             required />
           <b-form-input
-            v-model='model.name.family'
+            v-model='model.familyName'
             type='text'
             placeholder='Surname'
             required />
@@ -131,7 +131,10 @@ module.exports =
       data =
         or: [
           {email: cond}
+          {title: cond}
           {organization: cond}
+          {givenName: cond}
+          {familyName: cond}
         ]
       for await i from @$refs.remote.listAll data: data
         user = await @$refs.remote.getSupervisor i
@@ -164,9 +167,8 @@ module.exports =
     create: ->
       @data.unshift @$refs.remote.format
         email: ''
-        name:
-          given: ''
-          family: ''
+        givenName: ''
+        familyName: ''
         organization: ''
         title: ''
         phone: ''

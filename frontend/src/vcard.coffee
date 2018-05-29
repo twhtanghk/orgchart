@@ -47,9 +47,8 @@ class JSONVCard extends Transform
 class NameAttr extends Transform
   _transform: (chunk, encoding, cb) ->
     [family, given] = chunk.n?.split ';'
-    chunk.name =
-      family: family
-      given: given
+    chunk.familyName = family
+    chunk.givenName = given
     @push chunk
     cb()
 

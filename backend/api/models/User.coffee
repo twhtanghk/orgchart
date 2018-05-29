@@ -17,8 +17,11 @@ module.exports =
       type: 'string'
       unique: true
 
-    name:
-      type: 'json'
+    givenName:
+      type: 'string'
+
+    familyName:
+      type: 'string'
 
     organization:
       type: 'string'
