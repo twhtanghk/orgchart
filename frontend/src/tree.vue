@@ -125,6 +125,8 @@ module.exports =
       await @$refs.remote.dropUser data
       await @$refs.remote.reload data.supervisor
     search: (value) ->
+      if value == ''
+        return
       cond = contains: value
       data =
         or: [
@@ -138,7 +140,7 @@ module.exports =
           supervisor = list.find (user) ->
             user.email == j.email
           supervisor.opened = true
-          if not supervisor.subordinates?
+          if not (supervisor.subordinates? and supervisor.subordinates.length != 30)
             await @toggleUser null, supervisor
           list = supervisor.subordinates
     upload: (files) ->
@@ -194,7 +196,7 @@ module.exports =
     collapse: (nodes = @data) ->
       for {list, key, node} from @dfs nodes
         node.opened = false
-  mounted: ->
+  created: ->
     @eventBus
       .$on 'tree.search', @search
       .$on 'tree.upload', @upload

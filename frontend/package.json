@@ -13,6 +13,7 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.0-beta.6",
     "@vue/cli-service": "^3.0.0-beta.6",
+    "binarysearch": "^1.0.0",
     "bootstrap-vue": "^2.0.0-rc.6",
     "byline": "^5.0.0",
     "coffee-loader": "^0.9.0",
@@ -27,6 +28,7 @@
     "rxjs": "^6.2.0",
     "rxjs-to-async-iterator": "^2.1.3",
     "sass-loader": "^7.0.1",
+    "sort-by": "^1.2.0",
     "vcf": "^2.0.1",
     "vue-async-computed": "^3.3.1",
     "vue-fab": "https://github.com/twhtanghk/vue-fab",
