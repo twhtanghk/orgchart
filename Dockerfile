@@ -5,7 +5,9 @@ ADD . $APP
 
 WORKDIR $APP
 
-RUN yarn install
+RUN npm i -g coffeescript \
+&&  (cd backend; yarn install) \
+&&  (cd frontend; yarn install)
 
 EXPOSE 1337
 
