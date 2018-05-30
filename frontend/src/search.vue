@@ -1,8 +1,5 @@
 <template>
-  <mu-appbar title='Organization Chart' titleClass='left'>
-    <mu-icon-button icon='menu' slot='left' />
-    <mu-text-field icon='search' class='appbar-search-field' @change='change' slot='right'/>
-  </mu-appbar>
+  <mu-text-field icon='search' @change='change'/>
 </template>
 
 <script lang='coffee'>
@@ -24,13 +21,12 @@ module.exports =
 @import url('~muse-ui/dist/muse-ui.css');
 @import url('~muse-ui/dist/theme-light.css');
 
-.mu-appbar {
-  position: fixed;
-}
-
 .mu-text-field {
-  background-color: white;
+  border: solid rgb(0, 123, 255) 2px;
   border-radius: 5px;
-  margin-bottom: 0;
+  right: 5vw;
+  top: 2vh;
+  z-index: 999;
+  position: fixed;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <appbar />
+    <search />
     <tree />
     <fab />
   </div>
@@ -9,7 +9,7 @@
 <script lang='coffee'>
 module.exports =
   components:
-    appbar: require('./appbar').default
+    search: require('./search').default
     fab: require('./fab').default
     tree: require('./tree').default
 </script>
