@@ -13,7 +13,7 @@ sortBy = require 'sort-by'
 module.exports =
   extends: require('vue.model/src/model').default
   methods:
-    compare: sortBy 'organization', 'title', 'name.given', 'name.family', 'email'
+    compare: sortBy 'organization', 'title', 'givenName', 'familyName', 'email'
     format: (data) ->
       _.extend data,
         icon: 'fa fa-user icon-state-default'
