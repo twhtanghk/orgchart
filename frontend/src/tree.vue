@@ -3,7 +3,7 @@
     <model 
       ref='remote'
       :users='data'
-      baseUrl='http://172.19.0.3:1337/api/user' />
+      baseUrl='api/user' />
     <tree 
       multiple
       :data='data'
