@@ -136,13 +136,17 @@ module.exports =
           {givenName: cond}
           {familyName: cond}
         ]
-      for await i from @$refs.remote.listAll data: data
+      for await i from @$refs.remote.iterAll data: data
         user = await @$refs.remote.getSupervisor i
         list = @data
         for j from @$refs.remote.iterSupervisor user
+          list
+            .find (user) ->
+              user.email == i.email
+            ?.selected = true
           supervisor = list.find (user) ->
             user.email == j.email
-          supervisor.opened = true
+          supervisor?.opened = true
           if not (supervisor.subordinates? and supervisor.subordinates.length != 30)
             await @toggleUser null, supervisor
           list = supervisor.subordinates
@@ -210,10 +214,6 @@ module.exports =
 </script>
 
 <style scoped>
-div#tree {
-  padding-top: 64px;
-}
-
 input {
   display: inline-block;
   padding: 0;

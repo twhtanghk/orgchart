@@ -19,6 +19,7 @@ module.exports =
         icon: 'fa fa-user icon-state-default'
         subordinates: data.subordinates?.map @format
         opened: false
+        selected: false
     reload: (user) ->
       user.subordinates ?= []
       user.subordinates.splice 0, user.subordinates.length
@@ -35,7 +36,7 @@ module.exports =
         user.supervisor = await @getSupervisor user.supervisor
       user    
     getSubordinates: (supervisor = null) ->
-      @listAll
+      @iterAll
         data:
           supervisor: supervisor
     dropUser: ({subordinate, supervisor}) ->
@@ -59,7 +60,8 @@ module.exports =
       scope: 'User'
       response_type: 'token'
   created: ->
-    for await i from @getSubordinates()
-      @users.push i
+    for await page from @iterPage data: supervisor: null
+      for i in page
+        @users.push i
     @users.sort @compare
 </script>
