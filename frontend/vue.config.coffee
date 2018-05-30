@@ -4,6 +4,7 @@ module.exports =
   baseUrl: './'
   outputDir: '../backend/dist'
   configureWebpack: (config) ->
+    config.output.publicPath = ''
     config.node.setImmediate = true
     config.plugins.push new webpack.EnvironmentPlugin [
       'CLIENT_ID'
