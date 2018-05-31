@@ -1,4 +1,4 @@
 module.exports =
   requestloggerfile:
-    format: 'common'	
+    format: 'short'	
     inProduction: true
