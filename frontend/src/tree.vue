@@ -24,11 +24,11 @@
           <span>
             {{model.givenName}} {{model.familyName}}
           </span>
-          <a :href='"mailto:" + model.email'>
-            {{model.email}}
+          <a class='action' @click.stop :href='"mailto:" + model.email'>
+            <i class='fa fa-envelope' />
           </a>
-          <a :href='"tel:" + model.phone.office' v-if='model.phone'>
-            {{model.phone.office}}
+          <a class='action' @click.stop :href='"tel:" + model.phone.office' v-if='"office" in model.phone'>
+            <i class='fa fa-phone' />
           </a>
         </template>
         <template v-if='model.editing'>
@@ -245,5 +245,9 @@ input[placeholder='Phone No'] {
 
 button {
   margin-left: 2px;
+}
+
+a.action {
+  padding: .3em;
 }
 </style>
