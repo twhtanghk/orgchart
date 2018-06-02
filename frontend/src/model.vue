@@ -20,6 +20,7 @@ module.exports =
         subordinates: data.subordinates?.map @format
         opened: false
         selected: false
+        editing: false
     reload: (user) ->
       user.subordinates ?= []
       user.subordinates.splice 0, user.subordinates.length
