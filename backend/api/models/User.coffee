@@ -98,7 +98,7 @@ module.exports =
     @findOne cond
       .then (user) =>
         if user?
-          @update cond, _.pick(value, 'email', 'name', 'organization', 'title', 'phone', 'supervisor')
+          @update cond, _.pick(value, 'email', 'givenName', 'familyName', 'organization', 'title', 'phone', 'supervisor')
         else
           @create value
       .then =>
