@@ -164,7 +164,7 @@ module.exports =
       vcard = require('./vcard.coffee').default
       for file in files
         new FileReadStream file
-          .pipe vcard
+          .pipe vcard()
           .on 'error', console.error
           .pipe new Upload objectMode: true
           .on 'error', console.error

@@ -37,7 +37,11 @@ class JSONVCard extends Transform
       'nickname'
     ]
     for i in attrs
-      ret[i] = data[i]?._data?.trim()
+      field = data[i]
+      if Array.isArray data[i]
+        field = data[i].find (elem) ->
+          elem.type == 'work'
+      ret[i] = field?._data?.trim()
     ret
 
   _transform: (chunk, encoding, cb) ->
@@ -77,11 +81,12 @@ class FilterInvalid extends Transform
     cb()
     
 module.exports = 
-  default: pipe new LineStream(),
-    new FilterLine(pattern: /X\-LOTUS\-CHARSET\:UTF\-8/),
-    new SplitVCard(),
-    new JSONVCard(readableObjectMode: true),
-    new EmailAttr(objectMode: true),
-    new FilterInvalid(objectMode: true),
-    new NameAttr(objectMode: true),
-    new OrgAttr(objectMode: true)
+  default: ->
+    pipe new LineStream(),
+      new FilterLine(pattern: /X\-LOTUS\-CHARSET\:UTF\-8/),
+      new SplitVCard(),
+      new JSONVCard(readableObjectMode: true),
+      new EmailAttr(objectMode: true),
+      new FilterInvalid(objectMode: true),
+      new NameAttr(objectMode: true),
+      new OrgAttr(objectMode: true)
