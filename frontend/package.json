@@ -13,6 +13,9 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.0-beta.6",
     "@vue/cli-service": "^3.0.0-beta.6",
+    "babel-plugin-syntax-async-functions": "^6.13.0",
+    "babel-plugin-transform-regenerator": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
     "bootstrap-vue": "^2.0.0-rc.6",
     "byline": "^5.0.0",
     "coffee-loader": "^0.9.0",
@@ -38,7 +41,11 @@
   },
   "babel": {
     "presets": [
-      "@vue/app"
+      "@babel/env"
+    ],
+    "plugins": [
+      "syntax-async-functions",
+      "transform-regenerator"
     ]
   },
   "postcss": {
