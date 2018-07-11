@@ -13,4 +13,5 @@ module.exports =
     config.module.rules.push
       test: /\.coffee$/
       use: [ 'coffee-loader' ]
+    config.optimization.minimize = false
     return

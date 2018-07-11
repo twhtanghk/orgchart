@@ -1,4 +1,4 @@
 #!/bin/sh
 
-(cd frontend && node_modules/.bin/vue-cli-service build --mode development)
+(cd frontend && npm run build)
 (cd backend && npm start)
