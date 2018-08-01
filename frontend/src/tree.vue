@@ -86,7 +86,7 @@ _ = require 'lodash'
 FileReadStream = require 'filestream/read'
 Parser = require('csv').parse
 
-module.exports =
+export default
   components:
     tree: require('vue-jstree/src/tree').default
     model: require('./model').default

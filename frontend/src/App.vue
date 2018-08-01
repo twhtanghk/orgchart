@@ -7,7 +7,7 @@
 </template>
 
 <script lang='coffee'>
-module.exports =
+export default
   components:
     search: require('./search').default
     fab: require('./fab').default

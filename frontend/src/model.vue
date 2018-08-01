@@ -10,7 +10,7 @@ Vue = require('vue').default
 Vue.use require('vue.oauth2/src/plugin').default
 sortBy = require 'sort-by'
 
-module.exports =
+export default
   extends: require('vue.model/src/model').default
   methods:
     compare: sortBy 'organization', 'title', 'givenName', 'familyName', 'email'

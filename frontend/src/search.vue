@@ -6,7 +6,7 @@
 Vue = require('vue').default
 Vue.use require('muse-ui').default
 
-module.exports =
+export default
   props:
     eventBus:
       type: Object

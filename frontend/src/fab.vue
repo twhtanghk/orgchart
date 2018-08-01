@@ -15,7 +15,7 @@
 </template>
 
 <script lang='coffee'>
-module.exports =
+export default
   components:
     fab: require('vue-fab').default
     upload: require('vue-fab/src/upload').default
@@ -48,3 +48,12 @@ module.exports =
     collapse: ->
       @eventBus.$emit 'tree.collapse'
 </script>
+
+<style>
+i.md-36.material-icons {
+    left: 14px;
+    right: 14px;
+    top: 14px;
+    bottom: 14px;
+}
+</style>
