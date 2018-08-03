@@ -1,9 +1,9 @@
 #!/bin/sh
 
-pkg=csv-stringify csv-parse stream-transform csv-generate
+pkg="csv-stringify csv-parse stream-transform csv-generate"
 for i in $pkg; do
-  file=frontend/node_modules/$i/lib/es5/index.js
-  cp $file $(dirname $file)
+  dir=frontend/node_modules/$i/lib/es5
+  cp $dir/index.js $(dirname $dir)
 done
 
 (cd frontend && npm run build)
