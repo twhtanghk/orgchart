@@ -29,13 +29,15 @@
     "rxjs-to-async-iterator": "^2.1.3",
     "sass-loader": "^7.0.1",
     "sort-by": "^1.2.0",
+    "url-search-params-polyfill": "^4.0.1",
     "vcf": "^2.0.1",
     "vue-async-computed": "^3.3.1",
     "vue-fab": "https://github.com/twhtanghk/vue-fab",
     "vue-jstree": "https://github.com/twhtanghk/vue-jstree",
     "vue-template-compiler": "^2.5.13",
     "vue.model": "https://github.com/twhtanghk/vue.model",
-    "vue.oauth2": "https://github.com/twhtanghk/vue.oauth2"
+    "vue.oauth2": "https://github.com/twhtanghk/vue.oauth2",
+    "whatwg-fetch": "^2.0.4"
   },
   "babel": {
     "presets": [

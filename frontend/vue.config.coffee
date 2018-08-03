@@ -5,6 +5,9 @@ module.exports =
   baseUrl: './'
   outputDir: '../backend/dist'
   lintOnSave: false
+  transpileDependencies: [
+    /multipipe/
+  ]
   configureWebpack: (config) ->
     config.output.publicPath = ''
     config.node.setImmediate = true
@@ -17,4 +20,5 @@ module.exports =
         test: /\.coffee$/
         use: [ 'babel-loader', 'coffee-loader' ]
     _.extend config.optimization, minimize: false
+    config.entry.app.unshift 'whatwg-fetch', 'url-search-params-polyfill'
     return
