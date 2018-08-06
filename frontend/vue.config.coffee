@@ -20,5 +20,5 @@ module.exports =
         test: /\.coffee$/
         use: [ 'babel-loader', 'coffee-loader' ]
     _.extend config.optimization, minimize: false
-    config.entry.app.unshift 'whatwg-fetch', 'url-search-params-polyfill'
+    config.entry.app.unshift 'babel-polyfill', 'whatwg-fetch', 'url-search-params-polyfill'
     return
