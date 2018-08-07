@@ -80,13 +80,12 @@ class FilterInvalid extends Transform
       @push chunk
     cb()
     
-module.exports = 
-  default: ->
-    pipe new LineStream(),
-      new FilterLine(pattern: /X\-LOTUS\-CHARSET\:UTF\-8/),
-      new SplitVCard(),
-      new JSONVCard(readableObjectMode: true),
-      new EmailAttr(objectMode: true),
-      new FilterInvalid(objectMode: true),
-      new NameAttr(objectMode: true),
-      new OrgAttr(objectMode: true)
+export default ->
+  pipe new LineStream(),
+    new FilterLine(pattern: /X\-LOTUS\-CHARSET\:UTF\-8/),
+    new SplitVCard(),
+    new JSONVCard(readableObjectMode: true),
+    new EmailAttr(objectMode: true),
+    new FilterInvalid(objectMode: true),
+    new NameAttr(objectMode: true),
+    new OrgAttr(objectMode: true)
